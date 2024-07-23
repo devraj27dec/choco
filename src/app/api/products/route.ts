@@ -4,6 +4,7 @@ import { unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { db } from "@/lib/db/db";
 import { products } from "@/lib/db/schema";
+import { desc } from "drizzle-orm";
 
 export async function POST(request: Request) {
   try {
@@ -71,4 +72,20 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
+}
+
+
+export async function GET(request:NextRequest) {
+
+    try {
+
+        const allProducts = await db.select().from(products).orderBy(desc(products.id))
+        return Response.json(allProducts)
+    } catch (error) {
+        return Response.json(
+            { message: 'Failed to store product into the database' },
+            { status: 500 }
+        )
+    }
+    
 }
