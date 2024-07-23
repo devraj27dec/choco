@@ -8,6 +8,13 @@
       "when": 1721744249176,
       "tag": "0000_supreme_bushwacker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1721763162104,
+      "tag": "0001_sturdy_alex_wilder",
+      "breakpoints": true
     }
   ]
 }
