@@ -1,6 +1,7 @@
 import { db } from "@/lib/db/db";
-import { deliveryPersons } from "@/lib/db/schema";
+import { deliveryPersons, warehouses } from "@/lib/db/schema";
 import { deliveryPersonSchema } from "@/lib/validators/delieveryPersonSchema";
+import { desc, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 
@@ -29,3 +30,21 @@ export async function POST(request:NextRequest) {
         
     }
 }
+
+
+export async function GET() {
+    try {
+        const alldelieveryPersons = await db.select({
+            id: deliveryPersons.id,
+            name: deliveryPersons.name,
+            phone: deliveryPersons.phone,
+            warehouse: warehouses.name,
+        }).from(deliveryPersons).leftJoin(warehouses , eq(deliveryPersons.warehouseId , warehouses.id))
+        .orderBy(desc(deliveryPersons.id))
+        
+        return NextResponse.json(alldelieveryPersons)
+    } catch (error) {
+        return NextResponse.json({ message: 'Failed to fetch delivery persons' }, { status: 500 }); 
+    }    
+}
+
