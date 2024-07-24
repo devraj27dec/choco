@@ -15,6 +15,20 @@
       "when": 1721763162104,
       "tag": "0001_sturdy_alex_wilder",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1721815214528,
+      "tag": "0002_parallel_ben_grimm",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1721817102869,
+      "tag": "0003_flimsy_kitty_pryde",
+      "breakpoints": true
     }
   ]
 }
