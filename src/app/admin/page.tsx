@@ -1,9 +1,10 @@
+import { Button } from '@/components/ui/button'
 import React from 'react'
 
 const AdminPage = () => {
   return (
     <div>
-        Admin Page
+        <Button>Click me</Button>        
     </div>
   )
 }
