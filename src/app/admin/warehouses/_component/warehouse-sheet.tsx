@@ -23,7 +23,7 @@ const WarehouseSheet = () => {
 
   const queryClient = useQueryClient();
 
-  const {mutate} = useMutation({
+  const {mutate , isPending} = useMutation({
     mutationKey: ['create-warehouse'],
     mutationFn: (data: Warehouse) => createWarehouses(data),
 
@@ -31,7 +31,8 @@ const WarehouseSheet = () => {
       queryClient.invalidateQueries({ queryKey: ['warehouses']});
 
       toast({
-        title: "Warehouse created successfully"
+        className:" bg-black text-white",
+        title: "Warehouse created successfully🚀"
       })
       onClose();
     }
@@ -51,7 +52,7 @@ const WarehouseSheet = () => {
           Create a new warehouse
         </SheetDescription>
         </SheetHeader>
-        <CreateWarehousesForm onSubmit={onSubmit}/>
+        <CreateWarehousesForm onSubmit={onSubmit} disabled={isPending}/>
       </SheetContent>
     </Sheet>
 

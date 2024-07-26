@@ -9,13 +9,14 @@ import { getAllWarehouses } from '@/http/api'
 import { DataTable } from '../products/_component/dataTable'
 import { columns } from './_component/columns'
 import { useNewWarehouse } from '@/store/warehouse-store'
+import { Loader2 } from 'lucide-react'
 
 const warehousesPage = () => {
 
   const {onOpen} = useNewWarehouse()
 
 
-  const { data: warehouses} = useQuery<Product[]>({
+  const { data: warehouses , isLoading , isError} = useQuery<Product[]>({
     queryKey:['warehouses'],
     queryFn: getAllWarehouses
   })
@@ -28,7 +29,16 @@ const warehousesPage = () => {
             <WarehouseSheet/>
         </div>
 
-        <DataTable columns={columns} data={warehouses || []}/>
+        {isError && <span className="text-red-500">Something went wrong.</span>}
+        
+        {isLoading ? (
+          <div className=' flex items-center justify-center'>
+            <Loader2 className='size-12 animate-spin' />
+          </div>
+        ): (
+          <DataTable columns={columns} data={warehouses || []}/>
+        )}
+
     </>
   )
 }

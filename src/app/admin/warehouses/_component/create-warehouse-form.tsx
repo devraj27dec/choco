@@ -13,10 +13,17 @@ import { Input } from "@/components/ui/input"
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { warehouseSchema } from '@/lib/validators/warehouseSchema'
+import { Loader2 } from 'lucide-react';
 
 export type FormValues = z.input<typeof warehouseSchema>;
 
-const CreateWarehousesForm = ({onSubmit} : {onSubmit: (formValus: FormValues) => void}) => {
+const CreateWarehousesForm = ({
+  onSubmit, 
+  disabled
+} : {
+  onSubmit: (formValus: FormValues) => void;
+  disabled: boolean;
+}) => {
   const form = useForm<z.infer<typeof warehouseSchema>>({
     resolver: zodResolver(warehouseSchema),
     defaultValues: {
@@ -58,7 +65,9 @@ const CreateWarehousesForm = ({onSubmit} : {onSubmit: (formValus: FormValues) =>
             </FormItem>
           )}
         />
-        <Button type="submit">Create</Button>
+        <Button className=' w-full' disabled={disabled}>
+          {disabled ? <Loader2 className=' size-4 animate-spin'/> : 'Create'}
+        </Button>
       </form>
     </Form>
 
