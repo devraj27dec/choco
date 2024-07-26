@@ -14,14 +14,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
 
 
 export type formValues = z.input<typeof productSchema> 
 
 export const CreateProductForm = ({
-  onSubmit
+  onSubmit,
+  disabled
 }: {
-    onSubmit: (formvalus: formValues) => void
+    onSubmit: (formvalus: formValues) => void;
+    disabled: boolean
 }) => {
 
 
@@ -100,10 +103,8 @@ export const CreateProductForm = ({
                 </FormItem>
             )}
         />
-
-        <Button className=" w-full">
-            {/* {disabled ? <Loader2 className=" size-4 animate-spin"/> : 'create'} */}
-            Create
+        <Button className=" w-full" disabled={disabled}>
+          {disabled ? <Loader2 className=" size-4 animate-spin"/> : 'create'}
         </Button>
       </form>
     </Form>
