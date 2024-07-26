@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Inter as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils";
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import { QueryProvider } from "@/providers/query-provider";
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = FontSans({
   subsets: ["latin"],
@@ -31,6 +31,7 @@ export default function RootLayout({
         <QueryProvider>
           {children}
         </QueryProvider>
+        <Toaster/>
       </body>
     </html>
   );

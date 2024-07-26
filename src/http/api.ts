@@ -21,3 +21,8 @@ export const getAllWarehouses = async() => {
     const response = await api.get('/warehouses');
     return await response.data;
 }
+
+export const createWarehouses = async(data : Warehouse) => {
+    const response = await api.post('/warehouses' , data)
+    return response.data
+}

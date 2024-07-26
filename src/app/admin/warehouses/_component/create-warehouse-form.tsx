@@ -17,13 +17,13 @@ import { warehouseSchema } from '@/lib/validators/warehouseSchema'
 export type FormValues = z.input<typeof warehouseSchema>;
 
 const CreateWarehousesForm = ({onSubmit} : {onSubmit: (formValus: FormValues) => void}) => {
-    const form = useForm<z.infer<typeof warehouseSchema>>({
-        resolver: zodResolver(warehouseSchema),
-        defaultValues: {
-            name: '',
-            pincode: '',
-        },
-    });
+  const form = useForm<z.infer<typeof warehouseSchema>>({
+    resolver: zodResolver(warehouseSchema),
+    defaultValues: {
+      name: '',
+      pincode: '',
+    },
+  });
 
   const handleSubmit = (values: FormValues) => {
     onSubmit(values)
