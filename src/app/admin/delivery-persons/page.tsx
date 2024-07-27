@@ -7,12 +7,14 @@ import { deliveryPersons } from '@/lib/db/schema'
 import { useQuery } from '@tanstack/react-query'
 import { Product } from '@/types'
 import DelieveryPersonsSheet from './_components/delivery-person-sheet'
+import { getAllDeliveryPersons } from '@/http/api'
 
 const DelieveryPersonsPage = () => {
 
 
   const { data: deliveryPersons} = useQuery<Product[]>({
-    queryKey: ['delivery']
+    queryKey: ['delivery-persons'],
+    queryFn: getAllDeliveryPersons,
   })
   return (
     <>
@@ -23,7 +25,6 @@ const DelieveryPersonsPage = () => {
             </Button>
           <DelieveryPersonsSheet/>
         </div>
-
         <DataTable columns={columns} data={deliveryPersons || []}/>
     </>
   )

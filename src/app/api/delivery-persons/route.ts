@@ -5,29 +5,25 @@ import { desc, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 
-
 export async function POST(request:NextRequest) {
     
     const reqData = await request.json()
 
     let validateData;
     try {
-
         validateData = await deliveryPersonSchema.parse(reqData);
-        
-    } catch (error) {
-        return NextResponse.json({
-            message:error
-        } , {status: 400})
+    } catch (err) {
+        return Response.json({ message: err }, { status: 400 });
     }
 
     try {
         await db.insert(deliveryPersons).values(validateData);
-        await NextResponse.json({message: 'OK'}, {status: 201})
-        
-    } catch (error) {
-        return NextResponse.json({message: 'Failed to store the delivery person into the database'}, {status: 500})
-        
+        return Response.json({ message: 'OK' }, { status: 201 });
+    } catch (err) {
+        return Response.json(
+            { message: 'Failed to store the delivery person into the database' },
+            { status: 500 }
+        );
     }
 }
 
