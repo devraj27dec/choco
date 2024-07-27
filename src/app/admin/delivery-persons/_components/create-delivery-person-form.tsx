@@ -1,7 +1,7 @@
-import React from 'react'
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -9,7 +9,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from "@/components/ui/form";
 
 import {
   Select,
@@ -17,37 +17,41 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
-import { deliveryPersonSchema } from '@/lib/validators/delieveryPersonSchema';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useQuery } from '@tanstack/react-query';
-import { Warehouse } from '@/types';
-import { getAllWarehouses } from '@/http/api';
-
+import { deliveryPersonSchema } from "@/lib/validators/delieveryPersonSchema";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { Warehouse } from "@/types";
+import { getAllWarehouses } from "@/http/api";
+import { Loader2 } from "lucide-react";
 
 export type FormValues = z.input<typeof deliveryPersonSchema>;
 
-const CreateDelieveryPersonForm = () => {
-
+const CreateDelieveryPersonForm = ({
+  onSubmit,
+  disabled,
+}: {
+  onSubmit: (formValus: FormValues) => void;
+  disabled: boolean;
+}) => {
   const form = useForm<z.infer<typeof deliveryPersonSchema>>({
     resolver: zodResolver(deliveryPersonSchema),
     defaultValues: {
-      name: '',
-      phone: '',
+      name: "",
+      phone: "",
     },
-  })
+  });
 
-  const {data: warehouses} = useQuery<Warehouse[]>({
-    queryKey:['warehouse'],
+  const { data: warehouses } = useQuery<Warehouse[]>({
+    queryKey: ["warehouse"],
     queryFn: () => getAllWarehouses(),
-  })
-
+  });
 
   const handleSubmit = (values: FormValues) => {
-
-  }
+    onSubmit(values);
+  };
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
@@ -66,7 +70,7 @@ const CreateDelieveryPersonForm = () => {
         />
         <FormField
           control={form.control}
-          name="name"
+          name="phone"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Phone</FormLabel>
@@ -85,34 +89,37 @@ const CreateDelieveryPersonForm = () => {
             <FormItem>
               <FormLabel>WarehouseId</FormLabel>
               <Select
-               onValueChange={(value) => field.onChange(parseInt(value))}
-               defaultValue={field.value ? field.value.toString() : ''}
+                onValueChange={(value) => field.onChange(parseInt(value))}
+                defaultValue={field.value ? field.value.toString() : ""}
               >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Warehouse Id" />
-                </SelectTrigger>
+                  </SelectTrigger>
                 </FormControl>
-              <SelectContent>
-                {warehouses &&
-                warehouses.map((item) => (
-                  <SelectItem
-                  key={item.id}
-                  value={item.id ? item.id?.toString() : ''}>
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+                <SelectContent>
+                  {warehouses &&
+                    warehouses.map((item) => (
+                      <SelectItem
+                        key={item.id}
+                        value={item.id ? item.id?.toString() : ""}
+                      >
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
               </Select>
 
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button className=" w-full" disabled={disabled}>
+          {disabled ? <Loader2 className=" size-4 animate-spin" /> : "Create"}
+        </Button>
       </form>
     </Form>
-  )
-}
+  );
+};
 
-export default CreateDelieveryPersonForm
+export default CreateDelieveryPersonForm;
