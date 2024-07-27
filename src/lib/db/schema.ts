@@ -55,15 +55,15 @@ export const orders = pgTable('orders' , {
 })
 
 
-export const deliveryPersons = pgTable('delievery_persons' , {
+export const deliveryPersons = pgTable('delivery_persons', {
     id: serial('id').primaryKey(),
-    name: varchar('name' , {length: 100}).notNull(),
-    phone: varchar('phone' , {length:13}).notNull(),
-    warehouseId: integer('warehouse_id').references(() => warehouses.id , {onDelete: 'cascade'}),
-    orderId: integer('order_id').references(() => orders.id , {onDelete: 'set null'}),
+    name: varchar('name', { length: 100 }).notNull(),
+    phone: varchar('phone', { length: 13 }).notNull(),
+    warehouseId: integer('warehouse_id').references(() => warehouses.id, { onDelete: 'cascade' }),
+    orderId: integer('order_id').references(() => orders.id, { onDelete: 'set null' }),
     updatedAt: timestamp('updated_at').default(sql`CURRENT_TIMESTAMP`),
     createdAt: timestamp('created_at').default(sql`CURRENT_TIMESTAMP`),
-})
+});
 
 
 export const inventories = pgTable('inventories' , {

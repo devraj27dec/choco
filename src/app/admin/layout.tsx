@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import Sidebar from "./_componet/sidebar"
+import Sidebar from "./_component/sidebar"
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (

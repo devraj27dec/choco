@@ -1,0 +1,118 @@
+import React from 'react'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+import { deliveryPersonSchema } from '@/lib/validators/delieveryPersonSchema';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { Warehouse } from '@/types';
+import { getAllWarehouses } from '@/http/api';
+
+
+export type FormValues = z.input<typeof deliveryPersonSchema>;
+
+const CreateDelieveryPersonForm = () => {
+
+  const form = useForm<z.infer<typeof deliveryPersonSchema>>({
+    resolver: zodResolver(deliveryPersonSchema),
+    defaultValues: {
+      name: '',
+      phone: '',
+    },
+  })
+
+  const {data: warehouses} = useQuery<Warehouse[]>({
+    queryKey:['warehouse'],
+    queryFn: () => getAllWarehouses(),
+  })
+
+
+  const handleSubmit = (values: FormValues) => {
+
+  }
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. John Doe" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g. +918899889988" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="warehouseId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>WarehouseId</FormLabel>
+              <Select
+               onValueChange={(value) => field.onChange(parseInt(value))}
+               defaultValue={field.value ? field.value.toString() : ''}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Warehouse Id" />
+                </SelectTrigger>
+                </FormControl>
+              <SelectContent>
+                {warehouses &&
+                warehouses.map((item) => (
+                  <SelectItem
+                  key={item.id}
+                  value={item.id ? item.id?.toString() : ''}>
+                    {item.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+              </Select>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
+  )
+}
+
+export default CreateDelieveryPersonForm

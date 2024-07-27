@@ -1,7 +1,7 @@
 'use client'
 import { Button } from '@/components/ui/button'
 import React from 'react'
-import { DataTable } from './_component/dataTable'
+import { DataTable } from '../_component/data-table'
 import { columns } from './_component/columns'
 import { useQuery } from '@tanstack/react-query'
 import { getAllProducts } from '@/http/api'
