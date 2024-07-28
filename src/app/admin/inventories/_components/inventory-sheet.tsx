@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/sheet';
 import CreateInventoryForm, { FormValues } from './create-inventory-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { InventoryData } from '@/types';
+import { Inventory, InventoryData } from '@/types';
 import { createInventory } from '@/http/api';
 import { useToast } from '@/components/ui/use-toast';
 import { useNewInventory } from '@/store/inventories-store';
@@ -33,7 +33,6 @@ const InventorySheet = () => {
   })
 
   const onSubmit = (values: FormValues) => {
-    console.log('values' , values);
     mutate(values)
   }
   

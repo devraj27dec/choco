@@ -49,7 +49,7 @@ const CreateInventoryForm = ({
 
   const { data: products } = useQuery<Product[]>({
     queryKey: ["products"],
-    queryFn: () => getAllProducts(),
+    queryFn: getAllProducts,
   });
 
   const handleSubmit = (values: FormValues) => {
