@@ -7,10 +7,10 @@ import {
   SheetHeader,
   SheetTitle,
   } from "@/components/ui/sheet"
-import { CreateProductForm , formValues} from './create-product-form';
+import { CreateProductForm , FormValues} from './create-product-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createProduct } from '@/http/api';
-import { useNewProduct } from '@/store/product-store';
+import { createProduct } from '@/http/api'
+import { useNewProduct } from '@/store/product-store'
 import { useToast } from "@/components/ui/use-toast"
 
 
@@ -18,7 +18,6 @@ const ProductSheet = () => {
   const {toast} = useToast()
 
   const { isOpen , onClose} = useNewProduct()
-
   const queryClient = useQueryClient();
 
   const {mutate , isPending} = useMutation({
@@ -34,17 +33,15 @@ const ProductSheet = () => {
     }
   })
 
-  const onSubmit = (values: formValues) => {
-    console.log("values" , values);
-
-    const formData = new FormData()
-
+  const onSubmit = (values: FormValues) => {
+    const formData = new FormData();
     formData.append('name' , values.name);
     formData.append('descriptions' , values.description);
     formData.append('price' , String(values.price));
     formData.append('image', (values.image as FileList)[0]);
     
-    mutate(formData);
+    // console.log("values" , values);
+    mutate(formData)
   }
 
   return (

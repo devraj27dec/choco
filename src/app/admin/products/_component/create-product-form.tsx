@@ -17,16 +17,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 
 
-export type formValues = z.input<typeof productSchema> 
+export type FormValues = z.input<typeof productSchema> 
 
 export const CreateProductForm = ({
   onSubmit,
   disabled
 }: {
-    onSubmit: (formvalus: formValues) => void;
-    disabled: boolean
+  onSubmit: (Formvalus: FormValues) => void;
+  disabled: boolean;
 }) => {
-
 
   const form = useForm<z.infer<typeof productSchema>>({
     resolver: zodResolver(productSchema),
@@ -40,9 +39,8 @@ export const CreateProductForm = ({
   const fileRef = form.register('image');
 
 
-  const handleSubmit = (values: formValues) => {
+  const handleSubmit = (values: FormValues) => {
     onSubmit(values)
-    
   }
 
   return (
@@ -68,7 +66,7 @@ export const CreateProductForm = ({
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea {...field} />
+                <Textarea placeholder="e.g Description..." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -78,13 +76,13 @@ export const CreateProductForm = ({
             control={form.control}
             name="image"
             render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Image</FormLabel>
-                    <FormControl>
-                        <Input type="file" {...fileRef}/>
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
+              <FormItem>
+                  <FormLabel>Image</FormLabel>
+                  <FormControl>
+                      <Input type="file" {...fileRef}/>
+                  </FormControl>
+                  <FormMessage />
+              </FormItem>
             )}
         />
         <FormField
@@ -104,7 +102,7 @@ export const CreateProductForm = ({
             )}
         />
         <Button className=" w-full" disabled={disabled}>
-          {disabled ? <Loader2 className=" size-4 animate-spin"/> : 'create'}
+          {disabled ? <Loader2 className=" size-4 animate-spin"/> : 'Create'}
         </Button>
       </form>
     </Form>

@@ -26,6 +26,7 @@ const ProductPage = () => {
       <Button size={'sm'} onClick={onOpen}>Add Product</Button>
       <ProductSheet/>
       </div>
+      
       {isError && <span className=' text-red-500'>Something went wrong.</span>}
     
       {isLoading ? (
