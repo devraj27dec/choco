@@ -8,22 +8,26 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
     const reqData = await request.json();
 
-    let validateData;
+    let validatedData;
 
     try {
-        validateData = await inventorySchema.parse(reqData)
-    } catch (error) {
-        return NextResponse.json({ message: error }, { status: 400 });
+        validatedData = await inventorySchema.parse(reqData);
+    } catch (err) {
+        return Response.json({ message: err }, { status: 400 });
     }
 
     try {
+        console.log('validated data', validatedData);
+        const data = await db.insert(inventories).values(validatedData);
 
-        await db.insert(inventories).values(validateData);
-
-        return NextResponse.json({message: "Ok"} , {status: 201})
+        console.log('Store Data' , data);
         
-    } catch (error) {
-        return NextResponse.json(
+
+        return Response.json({ message: 'OK' }, { status: 201 });
+    } catch (err) {
+        console.log('error: ', err);
+        // todo: check database status code, and if it is duplicate value code then send the message to the client.
+        return Response.json(
             { message: 'Failed to store the inventory into the database' },
             { status: 500 }
         );
@@ -43,7 +47,7 @@ export async function GET() {
         .leftJoin(products , eq(inventories.productId , products.id))
         .orderBy(desc(inventories.id))
 
-        await NextResponse.json(allInventories)
+        return NextResponse.json(allInventories)
         
     } catch (error) {
         return NextResponse.json({ message: 'Failed to fetch inventories' }, { status: 500 });
