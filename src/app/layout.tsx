@@ -4,6 +4,8 @@ import { Inter as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/toaster"
+import { getServerSession } from "next-auth";
+import AuthProvider from "@/providers/auth-provider";
 
 const inter = FontSans({
   subsets: ["latin"],
@@ -17,11 +19,15 @@ export const metadata: Metadata = {
 };
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const session = await getServerSession();
+  console.log('session',session);
+  
   return (
     <html lang="en">
       <body className={cn(
@@ -29,7 +35,9 @@ export default function RootLayout({
           inter.variable
         )}>
         <QueryProvider>
-          {children}
+          <AuthProvider session={session}>
+            {children}
+          </AuthProvider>
         </QueryProvider>
         <Toaster/>
       </body>

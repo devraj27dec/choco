@@ -4,9 +4,9 @@ import { Product } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { getSingleProduct, placeOrder } from "@/http/api";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Header from "../../_component/Header";
-import { Star } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { orderSchema } from "@/lib/validators/orderSchema";
@@ -25,10 +25,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useMemo } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 const SingleProduct = () => {
   const params = useParams();
   const id = params.id;
+  const pathname = usePathname();
+  // console.log('pathname' , pathname);
+  
+
+  const {data:session} = useSession();
+  // console.log('session' , session);
+  
 
   const { data: product, isLoading } = useQuery<Product>({
     queryKey: ["product", id],
@@ -45,7 +54,7 @@ const SingleProduct = () => {
     },
   });
 
-  const { mutate } = useMutation({
+  const { mutate , isPending } = useMutation({
     mutationKey: ["order"],
     mutationFn: (data: FormValues) =>
       placeOrder({ ...data, productId: Number(id) }),
@@ -198,7 +207,15 @@ const SingleProduct = () => {
                   <Separator className=" my-6 bg-brown-900"/>
                   <div className=" flex items-center justify-between">
                     <span className="text-3xl font-semibold">${price}</span>
-                    <Button type="submit">Buy Now</Button>
+                    {session ? (
+                      <Button type="submit" disabled={isPending}>
+                      {isPending ? <Loader2 className=" mr-2 size-5 animate-spin"/> : <span>Buy Now</span>}
+                    </Button>
+                    ) : (
+                      <Link href={`/api/auth/signin?callbackUrl=${pathname}`}>
+                        <Button>Buy Now</Button>
+                      </Link>
+                    )}
                   </div>
                 </form>
               </Form>
