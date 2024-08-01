@@ -1,5 +1,5 @@
 
-import { DeliveryPerson, InventoryData, Warehouse } from "@/types";
+import { DeliveryPerson, InventoryData, OrderData, Warehouse } from "@/types";
 import { api } from "./client"
 
 
@@ -15,6 +15,11 @@ export const createProduct = async(data: FormData) => {
         },
     }) 
     return await response.data
+}
+
+export const getSingleProduct = async (id: string) => {
+    const response = await api.get(`/products/${id}`)
+    return await response.data;
 }
 
 export const getAllWarehouses = async() => {
@@ -46,5 +51,11 @@ export const getAllInventories = async() => {
 
 export const createInventory = async(data: InventoryData) => {
     const response = await api.post('/inventories' , data);
+    return await response.data;
+}
+
+
+export const placeOrder = async(data:OrderData ) => {
+    const response = await api.post('/orders' , data)
     return await response.data;
 }

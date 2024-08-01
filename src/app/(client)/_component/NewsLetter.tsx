@@ -26,7 +26,6 @@ const NewsLetter = () => {
                     Subscribe
                 </Button>
             </div>
-
             <Image 
              src={bgImage}
              alt='Hero Choclate'
