@@ -55,6 +55,7 @@ export async function POST(request: NextRequest) {
       const order = await tx
         .insert(orders)
 
+        // @ts-ignore
         .values({
             ...validatedData,
             // @ts-ignore
