@@ -1,91 +1,68 @@
-import { productSchema } from "@/lib/validators/productSchema";
+import { isServer, productSchema } from "@/lib/validators/productSchema";
 import { NextRequest, NextResponse } from "next/server";
-import { unlink, writeFile } from "node:fs/promises";
+import { writeFile } from "fs/promises";
 import path from "node:path";
 import { db } from "@/lib/db/db";
 import { products } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 
 export async function POST(request: Request) {
+  const data = await request.formData();
+
+  let validatedData;
   try {
-    // Check user session
-    // const session = await getServerSession(authOptions);
-    // if (!session) {
-    //   return NextResponse.json({ message: 'Not allowed' }, { status: 401 });
-    // }
-
-    // // Check user role
-    // if (session.token.role !== 'admin') {
-    //   return NextResponse.json({ message: 'Not allowed' }, { status: 403 });
-    // }
-
-    // Parse and validate form data
-    const data = await request.formData();
-    let validatedData;
     validatedData = productSchema.parse({
       name: data.get("name"),
       description: data.get("description"),
       price: Number(data.get("price")),
       image: data.get("image"),
     });
+  } catch (err) {
+    return Response.json({ message: err }, { status: 400 });
+  }
 
-    // Handle image file
-    // const inputImage = validatedData.image instanceof File ? validatedData.image : validatedData.image[0];
-    const filename = `${Date.now()}.${validatedData.image.name.split(".").slice(-1)}`;
-    const filePath = path.join(process.cwd(), "public/assets", filename);
+  const inputImage = isServer
+    ? (validatedData.image as File)
+    : (validatedData.image as FileList)[0];
+  const filename = `${Date.now()}.${inputImage.name.split(".").slice(-1)}`; // choco.png 213123123123.png
 
-    try {
-      const buffer = Buffer.from(await validatedData.image.arrayBuffer());
-      await writeFile(filePath, buffer);
-    } catch (err) {
-      return NextResponse.json(
-        { message: "Failed to save the file to filesystem" },
-        { status: 500 }
-      );
-    }
-
-    // Insert product into the database
-
-    try {
-      await db.insert(products).values({ ...validatedData, image: filename });
-    } catch (err) {
-      // Remove stored image in case of failure
-      try {
-        await unlink(filePath);
-      } catch (cleanupErr) {
-        console.error("Failed to clean up file:", cleanupErr);
-      }
-      return NextResponse.json(
-        { message: "Failed to store product in the database" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(
-      { message: "Product created successfully" },
-      { status: 201 }
+  try {
+    const buffer = Buffer.from(await inputImage.arrayBuffer());
+    await writeFile(
+      path.join(process.cwd(), "public/assets", filename),
+      buffer
     );
   } catch (err) {
-    console.error("Unexpected error:", err);
-    return NextResponse.json(
-      { message: "An unexpected error occurred" },
+    return Response.json(
+      { message: "Failed to save the file to fs" },
       { status: 500 }
     );
   }
+
+  try {
+    await db.insert(products).values({ ...validatedData, image: filename });
+  } catch (err) {
+    // todo: remove stored image from fs
+    return Response.json(
+      { message: "Failed to store product into the database" },
+      { status: 500 }
+    );
+  }
+
+  return Response.json({ message: "OK" }, { status: 201 });
 }
 
-
-export async function GET(request:NextRequest) {
-
-    try {
-
-        const allProducts = await db.select().from(products).orderBy(desc(products.id))
-        return Response.json(allProducts)
-    } catch (error) {
-        return Response.json(
-            { message: 'Failed to store product into the database' },
-            { status: 500 }
-        )
-    }
-    
+export async function GET(request: NextRequest) {
+  try {
+    const allProducts = await db
+      .select()
+      .from(products)
+      .orderBy(desc(products.id));
+    return Response.json(allProducts);
+  } catch (error) {
+    return Response.json(
+      { message: "Failed to store product into the database" },
+      { status: 500 }
+    );
+  }
 }

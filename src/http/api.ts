@@ -14,7 +14,7 @@ export const createProduct = async(data: FormData) => {
             'Content-Type': 'multipart/form-data',
         },
     }) 
-    return await response.data
+    return response.data;
 }
 
 export const getSingleProduct = async (id: string) => {

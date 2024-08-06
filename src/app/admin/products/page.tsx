@@ -12,8 +12,7 @@ import { Loader2 } from 'lucide-react'
 
 const ProductPage = () => {
   const {onOpen} = useNewProduct();
-
-
+  
   const {data: products , isLoading , isError} = useQuery<Product[]>({
     queryKey: ["products"],
     queryFn: () => getAllProducts()
@@ -32,7 +31,6 @@ const ProductPage = () => {
       {isLoading ? (
         <div className=' flex items-center justify-center'>
           <Loader2 className=' size-10 animate-spin'/>
-
         </div>
       ) : (
         <DataTable columns={columns} data={products || []} />

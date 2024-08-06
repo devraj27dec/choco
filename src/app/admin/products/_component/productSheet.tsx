@@ -29,19 +29,19 @@ const ProductSheet = () => {
         title: 'Product created successfully',
       });
       onClose();
-
     }
   })
 
   const onSubmit = (values: FormValues) => {
-    const formData = new FormData();
-    formData.append('name' , values.name);
-    formData.append('descriptions' , values.description);
-    formData.append('price' , String(values.price));
-    formData.append('image', (values.image as FileList)[0]);
+    console.log('values' , values);
+    const formdata = new FormData();
+    formdata.append('name' , values.name);
+    formdata.append('description' , values.description);
+    formdata.append('price' , String(values.price));
+    formdata.append('image', (values.image as FileList)[0]);
     
     // console.log("values" , values);
-    mutate(formData)
+    mutate(formdata)
   }
 
   return (
