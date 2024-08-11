@@ -9,45 +9,17 @@ import { Separator } from '@/components/ui/separator'
 import Image from 'next/image'
 
 const MyOrdersPage = () => {
-  const {data: myOrders} = useQuery<MyOrder[]> ({
+  const {data: MyOrders , isLoading} = useQuery<MyOrder[]> ({
     queryKey: ['my-orders'],
     queryFn: getMyOrders,
   })
   return (
     <div>
         <Header/>
-        <section>
-            <div>
-                <h1>Order history</h1>
-                <p>Check the status of recent orders.</p>
-                {myOrders?.map((item) => (
-                    <Card key={item.id}>
-                        <div className=' flex gap-x-5'>
-                            <div className=' flex flex-col p-5 text-sm'>
-                                <span>Date placed</span>
-                                <span>{FormData(item.createdAt)}</span>
-                            </div>
-                            <div className=' flex flex-col p-5 text-sm'>
-                                <span>Total amount</span>
-                                <span>${item.price}</span>
-                            </div>
-                        </div>
-                        <Separator/>
-                        <div className=' flex gap-x-10 p-5'>
-                            <Image
-                             src={`/assets/${item.image}`}
-                             alt='img'
-                             width={120}
-                             height={120}
-                             className=' rounded-md object-cover '
-                            />
-
-                            <div className=' flex-1'>
-                                
-                            </div>
-                        </div>
-                    </Card>
-                ))}
+        <section className=' relative border-t'>
+            <div className=' mx-auto h-full max-w-5xl px-5 py-14'>
+                <h1 className=' mb-5 text-3xl'>Order History</h1>
+                <p className=' mb-5'>Check the status of recent orders.</p>
             </div>
 
         </section>
