@@ -12,12 +12,11 @@ import { orderSchema } from "@/lib/validators/orderSchema";
 import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextRequest } from "next/server";
-import Stripe from 'stripe'
+import Stripe from "stripe";
 
-
-const stripe = new Stripe(process.env.STRIPE_PAYMENT_SECRET_KEY as string , {
-  apiVersion: '2024-06-20',
-})
+const stripe = new Stripe(process.env.STRIPE_PAYMENT_SECRET_KEY as string, {
+  apiVersion: "2024-06-20",
+});
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -149,60 +148,61 @@ export async function POST(request: NextRequest) {
     );
   }
 
-    // Stripe payment session creation
-    try {
-      const checkoutSession = await stripe.checkout.sessions.create({
-          payment_method_types: ['card'],
-          line_items: [
-            {
-              price_data: {
-                  currency: 'usd',
-                  product_data: {
-                    name: foundProducts[0].name,
-                  },
-                  unit_amount: foundProducts[0].price * 100, // Stripe expects amounts in cents
-              },
-              quantity: validatedData.qty,
+  // Stripe payment session creation
+  try {
+    const checkoutSession = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: foundProducts[0].name,
             },
-          ],
-          mode: 'payment',
-          success_url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/cancel`,
-      });
+            unit_amount: foundProducts[0].price * 100, // Stripe expects amounts in cents
+          },
+          quantity: validatedData.qty,
+        },
+      ],
+      mode: "payment",
+      success_url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/return`,
+    });
 
-      return new Response(JSON.stringify({ paymentUrl: checkoutSession.url }), { status: 200 });
+    return new Response(JSON.stringify({ paymentUrl: checkoutSession.url }), {
+      status: 200,
+    });
   } catch (err) {
-      console.log('Error creating Stripe session:', err);
-      return Response.json({
-          message: 'Failed to create a Stripe session',
-      }, { status: 500 });
+    console.log("Error creating Stripe session:", err);
+    return Response.json(
+      {
+        message: "Failed to create a Stripe session",
+      },
+      { status: 500 }
+    );
   }
 }
 
-
-
-
-
 export async function GET() {
   const allOrders = await db
-      .select({
-          id: orders.id,
-          product: products.name,
-          productId: products.id,
-          userId: users.id,
-          user: users.fname,
-          type: orders.type,
-          price: orders.price,
-          image: products.image,
-          status: orders.status,
-          address: orders.address,
-          qty: orders.qty,
-          createAt: orders.createdAt,
-      })
-      .from(orders)
-      .leftJoin(products, eq(orders.productId, products.id))
-      .leftJoin(users, eq(orders.userId, users.id))
-      .orderBy(desc(orders.id));
+    .select({
+      id: orders.id,
+      product: products.name,
+      productId: products.id,
+      userId: users.id,
+      user: users.fname,
+      type: orders.type,
+      price: orders.price,
+      image: products.image,
+      status: orders.status,
+      address: orders.address,
+      qty: orders.qty,
+      createAt: orders.createdAt,
+    })
+    .from(orders)
+    .leftJoin(products, eq(orders.productId, products.id))
+    .leftJoin(users, eq(orders.userId, users.id))
+    .orderBy(desc(orders.id));
 
   return Response.json(allOrders);
 }
