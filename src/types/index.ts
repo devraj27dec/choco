@@ -40,3 +40,18 @@ export interface OrderData {
     pincode: string;
     address: string;
 }
+
+
+
+export interface MyOrder {
+    id: number;
+    image: string;
+    price: number;
+    product: string;
+    address: string;
+    productDescription: string;
+    status: string;
+    type: string;
+    createdAt: string;
+}
+

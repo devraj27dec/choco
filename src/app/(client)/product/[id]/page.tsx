@@ -1,5 +1,4 @@
 "use client";
-
 import { Product } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
@@ -27,8 +26,15 @@ import { Separator } from "@/components/ui/separator";
 import { useMemo } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { AxiosError } from "axios";
+import { useToast } from "@/components/ui/use-toast";
+
+type CustomError =  {
+  message: string;
+}
 
 const SingleProduct = () => {
+  const {toast} = useToast()
   const params = useParams();
   const id = params.id;
   const pathname = usePathname();
@@ -36,7 +42,7 @@ const SingleProduct = () => {
   
 
   const {data:session} = useSession();
-  // console.log('session' , session);
+  console.log('session' , session);
   
 
   const { data: product, isLoading } = useQuery<Product>({
@@ -55,18 +61,32 @@ const SingleProduct = () => {
   });
 
   const { mutate , isPending } = useMutation({
-    mutationKey: ["order"],
+    mutationKey: ["orders"],
     mutationFn: (data: FormValues) =>
       placeOrder({ ...data, productId: Number(id) }),
-    onSuccess: () => {
-      alert("Order Placed !!");
+    onSuccess: (data) => {
+      window.location.href = data.paymentUrl
     },
+    onError: (err: AxiosError) => {
+      if(err.response?.data){
+        const customErr = err.response.data as CustomError;
+        console.error('Error Details', customErr.message)
+        
+        toast({
+          title: customErr.message,
+          color: 'red'
+        })
+      }else{
+        console.error(err),
+        toast({title:'Unknown Error'})
+      }
+    }
   });
 
   type FormValues = z.infer<typeof orderSchema>;
 
   const handleSubmit = (values: FormValues) => {
-    console.log(values);
+    console.log('form Values', values);
     mutate(values);
   };
   
@@ -74,7 +94,7 @@ const SingleProduct = () => {
 
   const price = useMemo(() => {
     if (product?.price) {
-        return product.price * qty;
+      return product.price * qty;
     }
     return 0;
   }, [qty, product]);
@@ -146,7 +166,7 @@ const SingleProduct = () => {
                       control={form.control}
                       name="address"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="w-3/6">
                           <FormLabel>Address</FormLabel>
                           <FormControl>
                             <Textarea
@@ -184,7 +204,7 @@ const SingleProduct = () => {
                       name="qty"
                       render={({ field }) => {
                         return (
-                          <FormItem className="w-3/6">
+                          <FormItem>
                             <FormLabel>Qty</FormLabel>
                             <FormControl>
                               <Input
