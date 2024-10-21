@@ -10,7 +10,6 @@ export const authOptions: AuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
 
-
       async profile(profile, token: any) {
         console.log("profile", profile);
         console.log("tokens", token);
@@ -19,7 +18,7 @@ export const authOptions: AuthOptions = {
           fname: profile.given_name,
           lname: profile.family_name,
           email: profile.email,
-          provider: 'GOOGLE',
+          provider: "GOOGLE",
           externalId: profile.sub,
           image: profile.picture,
         };
@@ -29,7 +28,6 @@ export const authOptions: AuthOptions = {
           let user = await prisma.user.findUnique({
             where: { email: data.email },
           });
-
 
           // If user doesn't exist, create a new one
           if (!user) {
@@ -41,8 +39,8 @@ export const authOptions: AuthOptions = {
           return {
             ...data,
             name: data.fname,
-            id: String(user.id), 
-            role: user.role || "customer"
+            id: String(user.id),
+            role: user.role || "customer",
           };
         } catch (error) {
           console.log(error);
@@ -50,7 +48,7 @@ export const authOptions: AuthOptions = {
             id: "", // Return empty ID in case of error
           };
         }
-      }
+      },
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
