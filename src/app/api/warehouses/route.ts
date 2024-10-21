@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
     } catch (err) {
         return NextResponse.json({ message: err }, { status: 400 });
     }
-
     try {
         await db.insert(warehouses).values(validatedData);
 

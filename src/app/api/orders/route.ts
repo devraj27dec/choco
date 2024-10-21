@@ -165,8 +165,11 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/payment/return`,
+      success_url: `${process.env.APP_BASE_URL}/payment/success`,
+      cancel_url: `${process.env.APP_BASE_URL}/payment/return`,
+      metadata: {
+        order_id: String(finalOrder.id),
+      },
     });
 
     return new Response(JSON.stringify({ paymentUrl: checkoutSession.url }), {

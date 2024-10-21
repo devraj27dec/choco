@@ -1,13 +1,17 @@
+import { PrismaClient } from '@prisma/client';
 
+const prismaClientSingleton = () => {
+    return new PrismaClient();
+};
 
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
 
-const queryString = "postgresql://postgres.wslboyscbvjtewkzkffl:DOlAyh6icgRF7FY2@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres";
+const globalForPrisma = globalThis as unknown as {
+    prisma: PrismaClientSingleton | undefined;
+};
 
-console.log("ENV TESTING:" , process.env.TEST_ENV as string);
+const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 
+export default prisma;
 
-export const connection = postgres(queryString);
-
-export const db = drizzle(connection);
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

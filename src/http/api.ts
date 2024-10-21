@@ -5,7 +5,7 @@ import { api } from "./client"
 
 export const getAllProducts = async() => {
     const response = await api.get('/products')
-    return response.data;
+    return await response.data;
 }
 
 export const createProduct = async(data: FormData) => {

@@ -7,6 +7,7 @@ import NewsLetter from './_component/NewsLetter'
 import Products from './_component/products'
 
 const HomePage = () => {
+  
   return (
     <>
       <Header/>

@@ -1,1 +1,0 @@
-ALTER TABLE "delievery_persons" ALTER COLUMN "phone" SET DATA TYPE varchar(13);

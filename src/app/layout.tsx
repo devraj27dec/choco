@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { getServerSession } from "next-auth";
 import AuthProvider from "@/providers/auth-provider";
 
+
 const inter = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -25,8 +26,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
+
   const session = await getServerSession();
-  
+
   return (
     <html lang="en">
       <body className={cn(

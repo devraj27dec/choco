@@ -19,7 +19,7 @@ import { Loader2 } from "lucide-react";
 
 export type FormValues = z.input<typeof productSchema> 
 
-export const CreateProductForm = ({
+const CreateProductForm = ({
   onSubmit,
   disabled
 }: {
@@ -108,3 +108,5 @@ export const CreateProductForm = ({
     </Form>
   );
 };
+
+export default CreateProductForm

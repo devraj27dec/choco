@@ -1,13 +1,14 @@
 'use client';
 
 import { cn } from "@/lib/utils";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const Header = () => {
-
+  
   const pathname = usePathname();
-
+  
   const navItems = [
     {label: 'Home' , href: '/'},
     {label: 'Best Selling' , href: '/best-selling'},
@@ -30,7 +31,7 @@ const Header = () => {
               <Link href={item.href}>{item.label}</Link>
             </li>
           ))}
-          <li className=" text-brown-300 underline-offset-4 transition-all hover:cursor-pointer hover:text-brown-900 hover:underline  ">
+            <li className=" text-brown-300 underline-offset-4 transition-all hover:cursor-pointer hover:text-brown-900 hover:underline " onClick={() => signIn()}>
             Sign in
           </li>
         </ul>

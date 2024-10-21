@@ -8,6 +8,7 @@ import Header from "../../_component/Header";
 import { Loader2, Star } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { loadStripe } from "@stripe/stripe-js";
 import { orderSchema } from "@/lib/validators/orderSchema";
 import {
   Form,
@@ -23,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { AxiosError } from "axios";
@@ -32,6 +33,8 @@ import { useToast } from "@/components/ui/use-toast";
 type CustomError =  {
   message: string;
 }
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string);
 
 const SingleProduct = () => {
   const {toast} = useToast()
@@ -43,6 +46,8 @@ const SingleProduct = () => {
 
   const {data:session} = useSession();
   console.log('session' , session);
+
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
   
 
   const { data: product, isLoading } = useQuery<Product>({
@@ -62,7 +67,7 @@ const SingleProduct = () => {
 
   const { mutate , isPending } = useMutation({
     mutationKey: ["orders"],
-    mutationFn: (data: FormValues) =>
+    mutationFn: (data: FormValues) => 
       placeOrder({ ...data, productId: Number(id) }),
     onSuccess: (data) => {
       window.location.href = data.paymentUrl
@@ -229,8 +234,8 @@ const SingleProduct = () => {
                     <span className="text-3xl font-semibold">${price}</span>
                     {session ? (
                       <Button type="submit" disabled={isPending}>
-                      {isPending ? <Loader2 className=" mr-2 size-5 animate-spin"/> : <span>Buy Now</span>}
-                    </Button>
+                        {isPending ? <Loader2 className="mr-2 size-5 animate-spin"/> : <span>Buy Now</span>}
+                      </Button>
                     ) : (
                       <Link href={`/api/auth/signin?callbackUrl=${pathname}`}>
                         <Button>Buy Now</Button>
@@ -246,5 +251,3 @@ const SingleProduct = () => {
     </>
   );
 };
-
-export default SingleProduct;

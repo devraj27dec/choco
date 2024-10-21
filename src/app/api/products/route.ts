@@ -1,12 +1,24 @@
 import { isServer, productSchema } from "@/lib/validators/productSchema";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { writeFile } from "fs/promises";
 import path from "node:path";
-import { db } from "@/lib/db/db";
-import { products } from "@/lib/db/schema";
-import { desc } from "drizzle-orm";
+import prisma from "@/lib/db/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/authOptions";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+
+  const session = getServerSession(authOptions)
+
+  if (!session) {
+    return Response.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+
+  // @ts-ignore
+  if (session.token.role !== 'admin') {
+    return Response.json({ message: 'Not allowed' }, { status: 403 });
+  }
+
   const data = await request.formData();
 
   let validatedData;
@@ -26,12 +38,12 @@ export async function POST(request: Request) {
     : (validatedData.image as FileList)[0];
   const filename = `${Date.now()}.${inputImage.name.split(".").slice(-1)}`; // choco.png 213123123123.png
 
+
   try {
     const buffer = Buffer.from(await inputImage.arrayBuffer());
     await writeFile(
-      path.join(process.cwd(), "public/assets", filename),
-      buffer
-    );
+      // @ts-ignore
+      path.join(process.cwd(), "public/assets", filename),buffer);
   } catch (err) {
     return Response.json(
       { message: "Failed to save the file to fs" },
@@ -40,7 +52,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    await db.insert(products).values({ ...validatedData, image: filename });
+    await prisma.product.create({
+      data: {
+        name: validatedData.name,
+        description: validatedData.description,
+        price: validatedData.price,
+        image: filename
+      }
+    })
   } catch (err) {
     // todo: remove stored image from fs
     return Response.json(
@@ -52,12 +71,13 @@ export async function POST(request: Request) {
   return Response.json({ message: "OK" }, { status: 201 });
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const allProducts = await db
-      .select()
-      .from(products)
-      .orderBy(desc(products.id));
+    const allProducts = await prisma.product.findMany({
+      orderBy: {
+        id: "desc"
+      }
+    })
     return Response.json(allProducts);
   } catch (error) {
     return Response.json(
