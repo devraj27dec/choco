@@ -1,15 +1,6 @@
 import { authOptions } from "@/lib/auth/authOptions";
-import { db } from "@/lib/db/db";
-import {
-  deliveryPersons,
-  inventories,
-  orders,
-  products,
-  users,
-  warehouses,
-} from "@/lib/db/schema";
+import prisma from "@/lib/db/db";
 import { orderSchema } from "@/lib/validators/orderSchema";
-import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
@@ -22,128 +13,117 @@ export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return Response.json({ message: "Not Allowed" }, { status: 400 });
+    return new Response(JSON.stringify({ message: "Not Allowed" }), { status: 400 });
   }
 
-  let reqData = await request.json();
-
-  // console.log('session' , session);
+  const reqData = await request.json();
 
   let validatedData;
   let transactionError: string = "";
 
   try {
-    validatedData = await orderSchema.parse(reqData);
+    validatedData = orderSchema.parse(reqData);
   } catch (err) {
-    return Response.json({ message: err }, { status: 400 });
+    return new Response(JSON.stringify({ message: err }), { status: 400 });
   }
 
-  console.log("validated Data ", validatedData);
+  console.log("validated Data", validatedData);
 
-  const warehouseRes = await db
-    .select({ id: warehouses.id })
-    .from(warehouses)
-    .where(eq(warehouses.pincode, validatedData.pincode));
+  const warehouseRes = await prisma.warehouse.findFirst({
+    where: { pincode: validatedData.pincode },
+    select: { id: true },
+  });
 
-  if (!warehouseRes.length) {
-    return Response.json({ message: "No warehouse found" }, { status: 400 });
+  if (!warehouseRes) {
+    return new Response(JSON.stringify({ message: "No warehouse found" }), { status: 400 });
+  }
+  
+  const productIdString = validatedData.productId
+    ? String(validatedData.productId)
+    : null;
+
+
+  const foundProduct = await prisma.product.findFirst({
+    //@ts-ignore
+    where: { id: productIdString},
+  });
+
+  if (!foundProduct) {
+    return new Response(JSON.stringify({ message: "No Product found" }), { status: 400 });
   }
 
-  const foundProducts = await db
-    .select()
-    .from(products)
-    .where(eq(products.id, validatedData.productId))
-    .limit(1);
 
-  if (!foundProducts.length) {
-    return Response.json({ message: "No Product found" }, { status: 400 });
-  }
+  let finalOrder;
 
-  let finalOrder: any = null;
+
   try {
-    finalOrder = await db.transaction(async (tx) => {
-      // createOrder
-
-      const order = await tx
-        .insert(orders)
-
-        // @ts-ignore
-        .values({
+    finalOrder = await prisma.$transaction(async (tx) => {
+      // Create the order
+      const order = await tx.order.create({
+        data: {
           ...validatedData,
-          // @ts-ignore
-          userId: Number(session.token.id),
-          price: foundProducts[0].price * validatedData.qty,
-          // todo: move all statuses to enum or const
+          userId: session.user.id,
+          //@ts-ignore
+          price: foundProduct.price * validatedData.qty,
           status: "received",
-        })
-        .returning({ id: orders.id, price: orders.price });
+        },
+        select: { id: true, price: true },
+      });
 
-      const avilabelStock = await tx
-        .select()
-        .from(inventories)
-        .where(
-          and(
-            eq(inventories.warehouseId, warehouseRes[0].id),
-            eq(inventories.productId, validatedData.productId),
-            isNull(inventories.orderId)
-          )
-        )
-        .limit(validatedData.qty)
-        .for("update", { skipLocked: true });
 
-      if (avilabelStock.length < validatedData.qty) {
-        transactionError = `Stock is low, only ${avilabelStock.length} products available`;
-        tx.rollback();
-        return;
+      const availableStock = await tx.inventory.findMany({
+        where: {
+          warehouseId: warehouseRes.id,
+          productId: productIdString,
+          orderId: null,
+        },
+        take: validatedData.qty,
+        //@ts-ignore
+        lock: { forUpdate: true, skipLocked: true },
+      });
+
+      if (availableStock.length < validatedData.qty) {
+        transactionError = `Stock is low, only ${availableStock.length} products available`;
+        throw new Error(transactionError);
       }
 
-      const availablePersons = await tx
-        .select()
-        .from(deliveryPersons)
-        .where(
-          and(
-            isNull(deliveryPersons.orderId),
-            eq(deliveryPersons.warehouseId, warehouseRes[0].id)
-          )
-        )
-        .for("update")
-        .limit(1);
+      const availablePerson = await tx.deliveryPerson.findFirst({
+        where: {
+          orderId: null,
+          warehouseId: warehouseRes.id,
+        },
+        //@ts-ignore
+        lock: { forUpdate: true },
+      });
 
-      if (!availablePersons.length) {
+      if (!availablePerson) {
         transactionError = `Delivery person is not available at the moment`;
-        tx.rollback();
-        return;
+        throw new Error(transactionError);
       }
 
-      await tx
-        .update(inventories)
-        .set({ orderId: order[0].id })
-        .where(
-          inArray(
-            inventories.id,
-            avilabelStock.map((stock) => stock.id)
-          )
-        );
+      // Update inventory and delivery person with orderId
+      await tx.inventory.updateMany({
+        where: { id: { in: availableStock.map((stock) => stock.id) } },
+        data: { orderId: order.id },
+      });
 
-      await tx
-        .update(deliveryPersons)
-        .set({ orderId: order[0].id })
-        .where(eq(deliveryPersons.id, availablePersons[0].id));
+      await tx.deliveryPerson.update({
+        where: { id: availablePerson.id },
+        data: { orderId: order.id },
+      });
 
-      await tx
-        .update(orders)
-        .set({ status: "reserved" })
-        .where(eq(orders.id, order[0].id));
+      await tx.order.update({
+        where: { id: order.id },
+        data: { status: "reserved" },
+      });
 
-      return order[0];
+      return order;
     });
   } catch (error) {
-    return Response.json(
-      {
-        message: transactionError
-          ? transactionError
-          : "Error while db transaction",
-      },
+    return new Response(
+      JSON.stringify({
+        message: transactionError || "Error while processing the transaction",
+      }),
       { status: 500 }
     );
   }
@@ -156,10 +136,8 @@ export async function POST(request: NextRequest) {
         {
           price_data: {
             currency: "usd",
-            product_data: {
-              name: foundProducts[0].name,
-            },
-            unit_amount: foundProducts[0].price * 100, // Stripe expects amounts in cents
+            product_data: { name: foundProduct.name },
+            unit_amount: foundProduct.price * 100, // Stripe expects amounts in cents
           },
           quantity: validatedData.qty,
         },
@@ -167,45 +145,31 @@ export async function POST(request: NextRequest) {
       mode: "payment",
       success_url: `${process.env.APP_BASE_URL}/payment/success`,
       cancel_url: `${process.env.APP_BASE_URL}/payment/return`,
-      metadata: {
-        order_id: String(finalOrder.id),
-      },
+      metadata: { order_id: String(finalOrder?.id) },
     });
 
-    return new Response(JSON.stringify({ paymentUrl: checkoutSession.url }), {
-      status: 200,
-    });
+    return new Response(JSON.stringify({ paymentUrl: checkoutSession.url }), { status: 200 });
   } catch (err) {
     console.log("Error creating Stripe session:", err);
-    return Response.json(
-      {
-        message: "Failed to create a Stripe session",
-      },
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ message: "Failed to create Stripe session" }), { status: 500 });
   }
 }
 
 export async function GET() {
-  const allOrders = await db
-    .select({
-      id: orders.id,
-      product: products.name,
-      productId: products.id,
-      userId: users.id,
-      user: users.fname,
-      type: orders.type,
-      price: orders.price,
-      image: products.image,
-      status: orders.status,
-      address: orders.address,
-      qty: orders.qty,
-      createAt: orders.createdAt,
-    })
-    .from(orders)
-    .leftJoin(products, eq(orders.productId, products.id))
-    .leftJoin(users, eq(orders.userId, users.id))
-    .orderBy(desc(orders.id));
+  const allOrders = await prisma.order.findMany({
+    select: {
+      id: true,
+      product: { select: { name: true, id: true, image: true } },
+      user: { select: { id: true, fname: true } },
+      type: true,
+      price: true,
+      status: true,
+      address: true,
+      qty: true,
+      createdAt: true,
+    },
+    orderBy: { id: "desc" },
+  });
 
-  return Response.json(allOrders);
+  return new Response(JSON.stringify(allOrders));
 }

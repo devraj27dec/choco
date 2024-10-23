@@ -34,7 +34,7 @@ type CustomError =  {
   message: string;
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string);
+// const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string);
 
 const SingleProduct = () => {
   const {toast} = useToast()
@@ -47,7 +47,7 @@ const SingleProduct = () => {
   const {data:session} = useSession();
   console.log('session' , session);
 
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  // const [clientSecret, setClientSecret] = useState<string | null>(null);
   
 
   const { data: product, isLoading } = useQuery<Product>({
@@ -61,14 +61,14 @@ const SingleProduct = () => {
       address: "",
       pincode: "",
       qty: 1,
-      productId: Number(id),
+      productId: product?.id ?? ""
     },
   });
 
   const { mutate , isPending } = useMutation({
     mutationKey: ["orders"],
     mutationFn: (data: FormValues) => 
-      placeOrder({ ...data, productId: Number(id) }),
+      placeOrder({ ...data , productId: product?.id as string}),
     onSuccess: (data) => {
       window.location.href = data.paymentUrl
     },
@@ -251,3 +251,6 @@ const SingleProduct = () => {
     </>
   );
 };
+
+
+export default SingleProduct

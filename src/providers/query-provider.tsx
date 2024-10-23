@@ -8,7 +8,6 @@ function makeQueryClient() {
 }
 
 function getQueryClient() {
-    // we are on server
     if (typeof window === 'undefined') {
         return makeQueryClient();
     } else {

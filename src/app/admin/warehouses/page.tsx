@@ -12,9 +12,7 @@ import { useNewWarehouse } from '@/store/warehouse-store'
 import { Loader2 } from 'lucide-react'
 
 const warehousesPage = () => {
-
   const {onOpen} = useNewWarehouse()
-
 
   const { data: warehouses , isLoading , isError} = useQuery<Product[]>({
     queryKey:['warehouses'],

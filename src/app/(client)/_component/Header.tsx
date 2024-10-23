@@ -1,13 +1,14 @@
 'use client';
 
 import { cn } from "@/lib/utils";
-import { signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const Header = () => {
   
   const pathname = usePathname();
+  const sesssion = useSession();
   
   const navItems = [
     {label: 'Home' , href: '/'},
@@ -31,9 +32,19 @@ const Header = () => {
               <Link href={item.href}>{item.label}</Link>
             </li>
           ))}
-            <li className=" text-brown-300 underline-offset-4 transition-all hover:cursor-pointer hover:text-brown-900 hover:underline " onClick={() => signIn()}>
-            Sign in
-          </li>
+            {!sesssion.data?.user ? (
+              <li className=" text-brown-300 underline-offset-4 transition-all hover:cursor-pointer hover:text-brown-900 hover:underline ">
+                <button onClick={() => signIn()}>
+                  Sign in
+                </button>
+            </li>
+            ) : (
+              <li className=" text-brown-300 underline-offset-4 transition-all hover:cursor-pointer hover:text-brown-900 hover:underline " onClick={() => signOut()}>
+                <button>
+                  SignUp
+                </button>
+              </li>
+            )}
         </ul>
       </nav>
     </header>

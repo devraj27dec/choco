@@ -14,7 +14,6 @@ import { useToast } from "@/components/ui/use-toast";
 
 const ProductSheet = () => {
   const { toast } = useToast();
-
   const { isOpen, onClose } = useNewProduct();
   const queryClient = useQueryClient();
 

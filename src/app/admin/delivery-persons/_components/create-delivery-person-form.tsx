@@ -40,7 +40,7 @@ const CreateDelieveryPersonForm = ({
     resolver: zodResolver(deliveryPersonSchema),
     defaultValues: {
       name: "",
-      phone: "",
+      phone: ""
     },
   });
 
@@ -81,7 +81,7 @@ const CreateDelieveryPersonForm = ({
             </FormItem>
           )}
         />
-
+        
         <FormField
           control={form.control}
           name="warehouseId"
@@ -89,8 +89,7 @@ const CreateDelieveryPersonForm = ({
             <FormItem>
               <FormLabel>WarehouseId</FormLabel>
               <Select
-                onValueChange={(value) => field.onChange(parseInt(value))}
-                defaultValue={field.value ? field.value.toString() : ""}
+                value={field.value}
               >
                 <FormControl>
                   <SelectTrigger>
@@ -99,10 +98,10 @@ const CreateDelieveryPersonForm = ({
                 </FormControl>
                 <SelectContent>
                   {warehouses &&
-                    warehouses.map((item) => (
+                    warehouses.map((item , index) => (
                       <SelectItem
-                        key={item.id}
-                        value={item.id ? item.id?.toString() : ""}
+                        key={index}
+                        value={item.id ?? ""}
                       >
                         {item.name}
                       </SelectItem>

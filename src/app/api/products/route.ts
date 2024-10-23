@@ -1,5 +1,5 @@
 import { isServer, productSchema } from "@/lib/validators/productSchema";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { writeFile } from "fs/promises";
 import path from "node:path";
 import prisma from "@/lib/db/db";
@@ -8,16 +8,17 @@ import { authOptions } from "@/lib/auth/authOptions";
 
 export async function POST(request: NextRequest) {
 
-  const session = getServerSession(authOptions)
+  const session = await getServerSession(authOptions)
 
   if (!session) {
     return Response.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  // @ts-ignore
-  if (session.token.role !== 'admin') {
+  
+  if (session.user?.role !== 'admin') {
     return Response.json({ message: 'Not allowed' }, { status: 403 });
   }
+  
 
   const data = await request.formData();
 
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     return Response.json({ message: err }, { status: 400 });
   }
-
+  
   const inputImage = isServer
     ? (validatedData.image as File)
     : (validatedData.image as FileList)[0];
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await prisma.product.create({
+    const product = await prisma.product.create({
       data: {
         name: validatedData.name,
         description: validatedData.description,
@@ -60,6 +61,9 @@ export async function POST(request: NextRequest) {
         image: filename
       }
     })
+
+    return NextResponse.json( { ...product ,message:"Product Created Succssfully"} , {status: 201})
+    
   } catch (err) {
     // todo: remove stored image from fs
     return Response.json(
@@ -67,8 +71,6 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-
-  return Response.json({ message: "OK" }, { status: 201 });
 }
 
 export async function GET() {

@@ -6,7 +6,6 @@ type NewWarehouseState = {
     onClose: () => void;
 };
 
-
 export const useNewWarehouse = create<NewWarehouseState>((set) => {
     return {
         isOpen: false,

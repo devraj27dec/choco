@@ -1,34 +1,47 @@
-import { db } from "@/lib/db/db";
-import { warehouses } from "@/lib/db/schema";
+import { authOptions } from "@/lib/auth/authOptions";
+import prisma from "@/lib/db/db";
 import { warehouseSchema } from "@/lib/validators/warehouseSchema";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-    const reqData = await request.json();
 
-    let validatedData;
+  const session = await getServerSession(authOptions);
 
-    try {
-        validatedData = await warehouseSchema.parse(reqData);
-        console.log(validatedData);
-    } catch (err) {
-        return NextResponse.json({ message: err }, { status: 400 });
-    }
-    try {
-        await db.insert(warehouses).values(validatedData);
+  if(!session) {
+    return NextResponse.json({message:"Unautorized"} , {status: 401})
+  }
 
-        return NextResponse.json({ message: 'OK' }, { status: 201 });
-    } catch (err) {
-        return NextResponse.json({ message: 'Failed to store the warehouse' }, { status: 500 });
-    }
+  if(session?.user.role !== "admin") {
+    return NextResponse.json({message:"Unautorized"} , {status: 403})
+  }
+  const reqData = await request.json();
+
+  let validatedData;
+
+  try {
+    validatedData = warehouseSchema.parse(reqData);
+    console.log(validatedData);
+  } catch (err) {
+    return NextResponse.json({ message: err }, { status: 400 });
+  }
+
+  try {
+    await prisma.warehouse.create({
+      data: validatedData,
+    });
+
+    return NextResponse.json({ message: "OK" }, { status: 201 });
+  } catch (err) {
+    return NextResponse.json({ message: "Failed to store the warehouse" }, { status: 500 });
+  }
 }
 
-
 export async function GET() {
-    try {
-        const allwarehouses = await db.select().from(warehouses)
-        return Response.json(allwarehouses);
-    } catch (error) {
-        return Response.json({ message: 'Failed to fetch all warehouses' }, { status: 500 });
-    }
+  try {
+    const allWarehouses = await prisma.warehouse.findMany();
+    return NextResponse.json(allWarehouses);
+  } catch (error) {
+    return NextResponse.json({ message: "Failed to fetch all warehouses" }, { status: 500 });
+  }
 }

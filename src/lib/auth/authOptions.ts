@@ -1,6 +1,6 @@
 import GoogleProvider from "next-auth/providers/google";
 import prisma from "../db/db";
-import { Account, AuthOptions, Profile, Session } from "next-auth";
+import { Account, AuthOptions, NextAuthOptions, Profile, Session } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import { PrismaClientInitializationError } from "@prisma/client/runtime/library";
 
@@ -29,7 +29,6 @@ export const authOptions: AuthOptions = {
             where: { email: data.email },
           });
 
-          // If user doesn't exist, create a new one
           if (!user) {
             user = await prisma.user.create({
               data,
@@ -65,10 +64,14 @@ export const authOptions: AuthOptions = {
       account?: Account | null;
       profile?: Profile;
     }) {
-      if (account && profile) {
+      let user = await prisma.user.findUnique({
+        where: { email: token?.email as string },
+      });
+
+      if (account && profile && user) {
         token.email = profile.email as string;
         token.id = account.access_token;
-        token.role = "customer";
+        token.role = user?.role || "customer";
       }
       return token;
     },
@@ -76,13 +79,14 @@ export const authOptions: AuthOptions = {
       try {
         const user = await prisma.user.findUnique({
           where: {
-            email: token.email ?? "",
+            email: token?.email ?? "",
           },
         });
         if (user && token?.id) {
-          (session.user as any).id = token.id;
-          (session.user as any).role = token.role;
+          session.user.id = token.id,
+          session.user.role = token.role || "customer"
         }
+      
       } catch (error) {
         if (error instanceof PrismaClientInitializationError) {
           throw new Error("Internal server error");
@@ -96,4 +100,4 @@ export const authOptions: AuthOptions = {
       return true;
     },
   },
-};
+} satisfies NextAuthOptions

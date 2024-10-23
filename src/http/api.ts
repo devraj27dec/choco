@@ -44,16 +44,17 @@ export const createDeliveryPerson = async (data: DeliveryPerson) => {
 }
 
 
+
+
+export const createInventory = async(data: InventoryData) => {
+    const response = await api.post('/inventories' , data);
+    return response.data;
+}
+
 export const getAllInventories = async() => {
     const response = await api.get('/inventories')
     return await response.data;
 }
-
-export const createInventory = async(data: InventoryData) => {
-    const response = await api.post('/inventories' , data);
-    return await response.data;
-}
-
 
 export const placeOrder = async (data: OrderData ) => {
     const response = await api.post('/orders' , data)
