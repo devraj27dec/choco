@@ -2,11 +2,11 @@ import { authOptions } from "@/lib/auth/authOptions";
 import prisma from "@/lib/db/db";
 import { orderSchema } from "@/lib/validators/orderSchema";
 import { getServerSession } from "next-auth";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_PAYMENT_SECRET_KEY as string, {
-  apiVersion: "2024-06-20",
+  apiVersion:"2024-06-20",
 });
 
 export async function POST(request: NextRequest) {
@@ -30,23 +30,23 @@ export async function POST(request: NextRequest) {
   console.log("validated Data", validatedData);
 
   const warehouseRes = await prisma.warehouse.findFirst({
-    where: { pincode: validatedData.pincode },
+    where: { pincode: validatedData?.pincode },
     select: { id: true },
   });
+
+  console.log("Warehouse Data" , warehouseRes)
 
   if (!warehouseRes) {
     return new Response(JSON.stringify({ message: "No warehouse found" }), { status: 400 });
   }
   
-  const productIdString = validatedData.productId
-    ? String(validatedData.productId)
-    : null;
 
 
   const foundProduct = await prisma.product.findFirst({
-    //@ts-ignore
-    where: { id: productIdString},
+    where: { id: validatedData.productId},
   });
+
+  console.log("Product found" , foundProduct)
 
   if (!foundProduct) {
     return new Response(JSON.stringify({ message: "No Product found" }), { status: 400 });
@@ -54,27 +54,36 @@ export async function POST(request: NextRequest) {
 
 
   let finalOrder;
-
-
   try {
     finalOrder = await prisma.$transaction(async (tx) => {
       // Create the order
+
+      // console.log("Creating order with data:", {
+      //   ...validatedData,
+      //   userId: session.user.id,
+      //   price: foundProduct.price * validatedData.qty,
+      // });
+
       const order = await tx.order.create({
         data: {
           ...validatedData,
           userId: session.user.id,
-          //@ts-ignore
           price: foundProduct.price * validatedData.qty,
-          status: "received",
+          status: "recieved",
         },
-        select: { id: true, price: true },
+        select: { 
+          id: true, 
+          price: true,
+          status: true
+        },
       });
 
+      console.log("order Created Successfully" , order)
 
       const availableStock = await tx.inventory.findMany({
         where: {
           warehouseId: warehouseRes.id,
-          productId: productIdString,
+          productId: validatedData.productId,
           orderId: null,
         },
         take: validatedData.qty,
@@ -82,8 +91,11 @@ export async function POST(request: NextRequest) {
         lock: { forUpdate: true, skipLocked: true },
       });
 
+      console.log("Available stock fetched:", availableStock);
+
       if (availableStock.length < validatedData.qty) {
         transactionError = `Stock is low, only ${availableStock.length} products available`;
+        console.error("transactionError", transactionError)
         throw new Error(transactionError);
       }
 
@@ -96,8 +108,11 @@ export async function POST(request: NextRequest) {
         lock: { forUpdate: true },
       });
 
+      console.log("Available delivery person found:", availablePerson);
+
       if (!availablePerson) {
         transactionError = `Delivery person is not available at the moment`;
+        console.log('transactionError' , transactionError)
         throw new Error(transactionError);
       }
 
@@ -120,12 +135,7 @@ export async function POST(request: NextRequest) {
       return order;
     });
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        message: transactionError || "Error while processing the transaction",
-      }),
-      { status: 500 }
-    );
+    console.log("error" , error)
   }
 
   // Stripe payment session creation
@@ -170,6 +180,5 @@ export async function GET() {
     },
     orderBy: { id: "desc" },
   });
-
   return new Response(JSON.stringify(allOrders));
 }

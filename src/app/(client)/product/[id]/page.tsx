@@ -53,7 +53,7 @@ const SingleProduct = () => {
   const { data: product, isLoading } = useQuery<Product>({
     queryKey: ["product", id],
     queryFn: () => getSingleProduct(id as string),
-  });
+  }); 
 
   const form = useForm<z.infer<typeof orderSchema>>({
     resolver: zodResolver(orderSchema),
@@ -61,14 +61,14 @@ const SingleProduct = () => {
       address: "",
       pincode: "",
       qty: 1,
-      productId: product?.id ?? ""
+      productId: Number(id)
     },
   });
 
   const { mutate , isPending } = useMutation({
     mutationKey: ["orders"],
     mutationFn: (data: FormValues) => 
-      placeOrder({ ...data , productId: product?.id as string}),
+      placeOrder({ ...data , productId: Number(id)}),
     onSuccess: (data) => {
       window.location.href = data.paymentUrl
     },

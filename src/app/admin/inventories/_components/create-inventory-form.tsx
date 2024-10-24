@@ -15,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { inventorySchema } from "@/lib/validators/inventorySchema";
@@ -32,7 +31,7 @@ const CreateInventoryForm = ({
   onSubmit,
   disabled,
 }: {
-  onSubmit: (formValus: FormValues) => void;
+  onSubmit: (formValues: FormValues) => void;
   disabled: boolean;
 }) => {
   const form = useForm<z.infer<typeof inventorySchema>>({
@@ -42,9 +41,10 @@ const CreateInventoryForm = ({
     },
   });
 
+  // Fetching warehouses and products
   const { data: warehouses } = useQuery<Warehouse[]>({
     queryKey: ["warehouses"],
-    queryFn: () => getAllWarehouses(),
+    queryFn: getAllWarehouses,
   });
 
   const { data: products } = useQuery<Product[]>({
@@ -52,9 +52,13 @@ const CreateInventoryForm = ({
     queryFn: getAllProducts,
   });
 
+  // Handle form submission
   const handleSubmit = (values: FormValues) => {
     onSubmit(values);
   };
+
+  // Log the products to verify their structure
+  console.log('Fetched Products:', products);
 
   return (
     <>
@@ -73,6 +77,7 @@ const CreateInventoryForm = ({
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="warehouseId"
@@ -93,9 +98,9 @@ const CreateInventoryForm = ({
                       warehouses.map((item) => (
                         <SelectItem
                           key={item.id}
-                          value={item.id ? item.id?.toString() : ""}
+                          value={item.id ? item.id.toString() : ""}
                         >
-                          {item.name}
+                          {item.name || 'Unnamed Warehouse'} {/* Fallback for missing name */}
                         </SelectItem>
                       ))}
                   </SelectContent>
@@ -106,7 +111,7 @@ const CreateInventoryForm = ({
           />
           <FormField
             control={form.control}
-            name="warehouseId"
+            name="productId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Product Id</FormLabel>
@@ -124,9 +129,9 @@ const CreateInventoryForm = ({
                       products.map((item) => (
                         <SelectItem
                           key={item.id}
-                          value={item.id ? item.id?.toString() : ""}
+                          value={item.id ? item.id.toString() : ""}
                         >
-                          {item.name}
+                          {item.image}
                         </SelectItem>
                       ))}
                   </SelectContent>
@@ -135,8 +140,9 @@ const CreateInventoryForm = ({
               </FormItem>
             )}
           />
-          <Button className=" w-full" disabled={disabled}>
-            {disabled ? <Loader2 className=" size-4 animate-spin" /> : 'Create'}
+
+          <Button className="w-full" disabled={disabled}>
+            {disabled ? <Loader2 className="size-4 animate-spin" /> : 'Create'}
           </Button>
         </form>
       </Form>

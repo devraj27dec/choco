@@ -15,19 +15,21 @@ export async function POST(request: NextRequest) {
   if (session.user?.role !== 'admin') {
     return Response.json({ message: 'Not allowed' }, { status: 403 });
   }
-  const reqData = await request.json();
+  const data = await request.json();
 
   let validateData;
   try {
-    validateData = await deliveryPersonSchema.parse(reqData);
+    validateData = await deliveryPersonSchema.parse(data);
   } catch (err) {
     return NextResponse.json({ message: String(err) }, { status: 400 });
   }
-  console.log("validatedData" , validateData)
+  console.log("validatedData" , validateData);
+
+  
   try {
     const data = await prisma.deliveryPerson.create({
       data: {
-        warehouseId: validateData.warehouseId ?? "",
+        warehouseId: validateData.warehouseId,
         name: validateData.name, 
         phone: validateData.phone,
       },

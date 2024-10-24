@@ -81,38 +81,39 @@ const CreateDelieveryPersonForm = ({
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="warehouseId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>WarehouseId</FormLabel>
+              <FormLabel>Warehouse</FormLabel>
               <Select
-                value={field.value}
-              >
+                onValueChange={(value) => field.onChange(parseInt(value))}
+                defaultValue={field.value ? field.value.toString() : ''}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select Warehouse Id" />
+                    <SelectValue>
+                    {field.value
+                      ? `${warehouses?.find((wh) => wh.id === field.value)?.name} (ID: ${field.value})` || "Select Warehouse"
+                      : "Select Warehouse"}
+                    </SelectValue>
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {warehouses &&
-                    warehouses.map((item , index) => (
-                      <SelectItem
-                        key={index}
-                        value={item.id ?? ""}
-                      >
+                    warehouses.map((item) => (
+                      <SelectItem key={item.id} value={item.id ? item.id?.toString() : ""}>
                         {item.name}
                       </SelectItem>
                     ))}
                 </SelectContent>
               </Select>
-
               <FormMessage />
             </FormItem>
           )}
         />
+
         <Button className=" w-full" disabled={disabled}>
           {disabled ? <Loader2 className=" size-4 animate-spin" /> : "Create"}
         </Button>

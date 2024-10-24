@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json( { ...product ,message:"Product Created Succssfully"} , {status: 201})
+    return NextResponse.json(product,{status: 201})
     
   } catch (err) {
     // todo: remove stored image from fs

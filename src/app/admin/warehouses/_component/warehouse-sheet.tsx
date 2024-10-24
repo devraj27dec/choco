@@ -31,7 +31,6 @@ const WarehouseSheet = () => {
       queryClient.invalidateQueries({ queryKey: ['warehouses']});
 
       toast({
-        className:" bg-black text-white",
         title: "Warehouse created successfully🚀"
       })
       onClose();

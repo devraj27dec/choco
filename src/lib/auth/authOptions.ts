@@ -70,7 +70,7 @@ export const authOptions: AuthOptions = {
 
       if (account && profile && user) {
         token.email = profile.email as string;
-        token.id = account.access_token;
+        token.id = String(user.id);
         token.role = user?.role || "customer";
       }
       return token;

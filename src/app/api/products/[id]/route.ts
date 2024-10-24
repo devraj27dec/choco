@@ -11,7 +11,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     try {
     const product = await prisma.product.findFirst({
         where: {
-        id: id,  // Assuming 'id' is of type string in your schema
+        id: Number(id)
         },
     });
 

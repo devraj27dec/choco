@@ -16,8 +16,7 @@ export async function POST(request: NextRequest) {
   if (session.user?.role !== 'admin') {
     return Response.json({ message: 'Not allowed' }, { status: 403 });
   }
-
-
+  
   const reqData = await request.json();
 
   let validatedData;
@@ -28,15 +27,12 @@ export async function POST(request: NextRequest) {
     return Response.json({ message: err }, { status: 400 });
   }
 
-
   try {
     console.log("validated data", validatedData);
     const data = await prisma.inventory.create({
       data: {
         sku: validatedData.sku,
-        //@ts-ignore
         productId: validatedData.productId,
-        //@ts-ignore
         warehouseId: validatedData.warehouseId,
       },
     });

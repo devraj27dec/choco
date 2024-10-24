@@ -1,5 +1,5 @@
 export interface Product {
-    id: string;
+    id: number;
     name: string;
     description: string;
     image: string;
@@ -7,44 +7,56 @@ export interface Product {
 }
 
 export interface Warehouse {
-    id: string;
+    id: number;
     name: string;
     pincode: string;
 }
 
-
 export interface DeliveryPerson {
-    id: string;
+    id: number;
     name: string;
     phone: string;
-    warehouseId: string;
+    warehouseId: number;
 }
 
 export interface Inventory {
-    id: string;
+    id: number;
     sku: string;
-    warehouse: string;
-    product: string;
+    warehouse: number;
+    product:  number;
 }
 
 export interface InventoryData {
     sku: string;
-    warehouseId: string;
-    productId: string;
+    warehouseId: number;
+    productId: number;
 }
 
-
 export interface OrderData {
-    productId: string;
+    productId: number;
     qty: number;
     pincode: string;
     address: string;
 }
 
+export interface Order {
+    id: number;
+    product: number;
+    user: string;
+    type: string;
+    address: string;
+    status: string;
+    price: number;
+    qty: number;
+}
 
+export interface OrderStatusData {
+    orderId: number;
+    status: string;
+}
 
 export interface MyOrder {
-    id: string;
+    id: number;
     image: string;
     price: number;
     product: string;
@@ -54,4 +66,3 @@ export interface MyOrder {
     type: string;
     createdAt: string;
 }
-
