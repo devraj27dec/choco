@@ -2,7 +2,6 @@
 import { DeliveryPerson, InventoryData, OrderData, Warehouse , OrderStatusData } from "@/types";
 import { api } from "./client"
 
-
 export const getAllProducts = async() => {
     const response = await api.get('/products')
     return await response.data;
@@ -16,6 +15,7 @@ export const createProduct = async(data: FormData) => {
     }) 
     return response.data;
 }
+
 
 export const getSingleProduct = async (id: string) => {
     const response = await api.get(`/products/${id}`)
@@ -66,12 +66,10 @@ export const getAllOrders = async() => {
     return await response.data;
 }
 
-
 export const changeOrderStatus = async (data: OrderStatusData) => {
     const response = await api.patch(`/orders/status`, data);
     return await response.data;
 };
-
 
 export const getMyOrders = async() => {
     const response = await api.get('/orders/history');
