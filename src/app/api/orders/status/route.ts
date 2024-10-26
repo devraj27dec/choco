@@ -4,7 +4,7 @@ import { orderStatusSchema } from "@/lib/validators/orderStatusSchema";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req:NextRequest) {
+export async function PATCH(req:NextRequest) {
     
     const session = await getServerSession(authOptions)
 
@@ -19,12 +19,11 @@ export async function GET(req:NextRequest) {
     const reqData = await req.json();
 
     let validateData;
-
+    
     try {
         validateData = orderStatusSchema.parse(reqData)
     } catch (error) {
         return NextResponse.json({message: error} , {status: 400})
-        
     }
 
     try {
@@ -32,10 +31,9 @@ export async function GET(req:NextRequest) {
             where: {id: validateData.orderId},
             data: {status: validateData.status}
         })
-
         return Response.json({ message: validateData.status }, { status: 200 });
     } catch (error) {
-        return Response.json({ message: 'Failed to update the order' }, { status: 500 });   
+        return Response.json({ message: 'Failed to update the order status' }, { status: 500 });   
     }
 
 

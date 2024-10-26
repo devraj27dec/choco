@@ -56,14 +56,7 @@ export async function POST(request: NextRequest) {
   let finalOrder;
   try {
     finalOrder = await prisma.$transaction(async (tx) => {
-      // Create the order
-
-      // console.log("Creating order with data:", {
-      //   ...validatedData,
-      //   userId: session.user.id,
-      //   price: foundProduct.price * validatedData.qty,
-      // });
-
+      
       const order = await tx.order.create({
         data: {
           ...validatedData,
@@ -87,8 +80,6 @@ export async function POST(request: NextRequest) {
           orderId: null,
         },
         take: validatedData.qty,
-        //@ts-ignore
-        lock: { forUpdate: true, skipLocked: true },
       });
 
       console.log("Available stock fetched:", availableStock);
@@ -104,8 +95,6 @@ export async function POST(request: NextRequest) {
           orderId: null,
           warehouseId: warehouseRes.id,
         },
-        //@ts-ignore
-        lock: { forUpdate: true },
       });
 
       console.log("Available delivery person found:", availablePerson);
@@ -116,7 +105,6 @@ export async function POST(request: NextRequest) {
         throw new Error(transactionError);
       }
 
-      // Update inventory and delivery person with orderId
       await tx.inventory.updateMany({
         where: { id: { in: availableStock.map((stock) => stock.id) } },
         data: { orderId: order.id },
@@ -136,6 +124,12 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.log("error" , error)
+    return Response.json(
+      {
+        message: transactionError ? transactionError : 'Error while db transaction',
+      },
+      { status: 500 }
+    );
   }
 
   // Stripe payment session creation

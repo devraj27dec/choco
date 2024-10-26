@@ -52,7 +52,7 @@ model Warehouse {
 }
 
 model Order {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @default(uuid())
   userId    String
   status    String
   type      String   @default("quick")
@@ -75,7 +75,7 @@ model DeliveryPerson {
   name        String @db.VarChar(100)
   phone       String @db.VarChar(13)
   warehouseId Int?
-  orderId     Int?
+  orderId     String?
 
   updatedAt DateTime @default(now()) @updatedAt
   createdAt DateTime @default(now())
@@ -85,9 +85,9 @@ model DeliveryPerson {
 }
 
 model Inventory {
-  id          Int    @id @default(autoincrement())
-  sku         String @unique @db.VarChar(8)
-  orderId     Int?   @unique
+  id          String    @id @default(uuid())
+  sku         String    @unique @db.VarChar(8)
+  orderId     String?   @unique
   warehouseId Int
   productId   Int
 

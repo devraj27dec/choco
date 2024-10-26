@@ -20,7 +20,7 @@ export interface DeliveryPerson {
 }
 
 export interface Inventory {
-    id: number;
+    id: string;
     sku: string;
     warehouse: number;
     product:  number;
@@ -40,7 +40,7 @@ export interface OrderData {
 }
 
 export interface Order {
-    id: number;
+    id: string;
     product: number;
     user: string;
     type: string;
@@ -51,15 +51,15 @@ export interface Order {
 }
 
 export interface OrderStatusData {
-    orderId: number;
+    orderId: string;
     status: string;
 }
 
 export interface MyOrder {
-    id: number;
+    id:string;
     image: string;
     price: number;
-    product: string;
+    product: Product;
     address: string;
     productDescription: string;
     status: string;
