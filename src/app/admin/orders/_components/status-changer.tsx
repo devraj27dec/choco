@@ -11,7 +11,7 @@ import { OrderStatusData } from '@/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import React from 'react';
 
-const StatusChanger = ({ orderId, currentStatus }: { orderId: number; currentStatus: string }) => {
+const StatusChanger = ({ orderId, currentStatus }: { orderId: string; currentStatus: string }) => {
     const queryClient = useQueryClient();
     const { toast } = useToast();
 

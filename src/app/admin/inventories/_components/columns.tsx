@@ -17,11 +17,11 @@ export const columns: ColumnDef<Inventory>[] = [
         header: 'SKU',
     },
     {
-        accessorKey: 'warehouse',
+        accessorKey: 'warehouse.name',
         header: 'Warehouse',
     },
     {
-        accessorKey: 'product',
+        accessorKey: 'product.name',
         header: 'Product',
     },
     {

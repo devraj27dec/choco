@@ -46,7 +46,7 @@ const CreateDelieveryPersonForm = ({
 
   const { data: warehouses } = useQuery<Warehouse[]>({
     queryKey: ["warehouse"],
-    queryFn: () => getAllWarehouses(),
+    queryFn: getAllWarehouses,
   });
 
   const handleSubmit = (values: FormValues) => {

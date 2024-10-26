@@ -38,8 +38,8 @@ const WarehouseSheet = () => {
   })
 
   const onSubmit = (values: FormValues) => {
+    console.log("values" , values)
     mutate(values as Warehouse)
-    
   }
 
   return (

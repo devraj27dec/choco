@@ -41,7 +41,7 @@ export interface OrderData {
 
 export interface Order {
     id: string;
-    product: number;
+    product: Product;
     user: string;
     type: string;
     address: string;

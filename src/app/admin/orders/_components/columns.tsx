@@ -6,7 +6,7 @@ import StatusChanger from './status-changer';
 
 export const columns: ColumnDef<Order>[] = [
     {
-        accessorKey: 'product',
+        accessorKey: 'product.name',
         header: 'Product Name',
     },
     {
@@ -14,7 +14,7 @@ export const columns: ColumnDef<Order>[] = [
         header: 'Qty',
     },
     {
-        accessorKey: 'user',
+        accessorKey: 'user.fname',
         header: 'Customer Name',
     },
     {

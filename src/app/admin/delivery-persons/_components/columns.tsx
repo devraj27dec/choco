@@ -21,7 +21,7 @@ export const columns: ColumnDef<Product>[] = [
         header: 'Phone',
     },
     {
-        accessorKey: 'warehouse',
+        accessorKey: 'warehouse.name',
         header: 'Warehouse',
     },
     {
