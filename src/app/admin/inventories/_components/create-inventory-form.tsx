@@ -77,7 +77,6 @@ const CreateInventoryForm = ({
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="warehouseId"
@@ -100,7 +99,7 @@ const CreateInventoryForm = ({
                           key={item.id}
                           value={item.id ? item.id.toString() : ""}
                         >
-                          {item.name || 'Unnamed Warehouse'} {/* Fallback for missing name */}
+                          {item.name}
                         </SelectItem>
                       ))}
                   </SelectContent>
@@ -131,7 +130,7 @@ const CreateInventoryForm = ({
                           key={item.id}
                           value={item.id ? item.id.toString() : ""}
                         >
-                          {item.image}
+                          {item.name}
                         </SelectItem>
                       ))}
                   </SelectContent>

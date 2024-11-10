@@ -6,6 +6,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { getServerSession } from "next-auth";
 import AuthProvider from "@/providers/auth-provider";
+import CartProvider from "@/providers/cart-provider";
 
 const inter = FontSans({
   subsets: ["latin"],
@@ -30,10 +31,11 @@ export default async function RootLayout({
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
           inter.variable)}>
-            
-        <QueryProvider>
-          <AuthProvider session={session}>{children}</AuthProvider>
-        </QueryProvider>
+          <CartProvider>
+            <QueryProvider>
+                <AuthProvider session={session}>{children}</AuthProvider>
+            </QueryProvider>
+          </CartProvider>
         <Toaster />
       </body>
     </html>
