@@ -238,7 +238,7 @@ const SingleProduct = () => {
                       </Button>
                     ) : (
                       <Link href={`/api/auth/signin?callbackUrl=${pathname}`}>
-                        <Button>Buy Now</Button>
+                        <Button >Buy Now</Button>
                       </Link>
                     )}
                   </div>

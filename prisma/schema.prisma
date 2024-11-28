@@ -33,6 +33,7 @@ model Product {
   image       String?     @db.Text
   description String?     @db.Text
   price       Float
+  qty         Int?
   updatedAt   DateTime    @default(now()) @updatedAt
   createdAt   DateTime    @default(now())
   orders      Order[]

@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAllProducts } from "@/http/api";
-import { useCart } from "@/providers/cart-provider";
 import { Product } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
@@ -16,7 +15,6 @@ const Products = () => {
     queryFn: getAllProducts,
   });
 
-  const {items , addToCart} = useCart()
 
   return (
     <section className=" bg-[#f5f5f5] px-14 md:py-20">
@@ -60,9 +58,6 @@ const Products = () => {
                       <div className=" mt-1 space-x-2">
                         <span className=" font-bold">{product.price}</span>
                       </div>
-                      <Button size={'sm'} className=" mt-5 w-full bg-white text-black font-semibold border hover:text-white" onClick={() => addToCart(product)}>
-                        Add To Cart
-                      </Button>
                       <Link href={`/product/${product.id}`}>
                         <Button
                           size={"sm"}

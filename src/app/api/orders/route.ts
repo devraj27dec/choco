@@ -2,7 +2,7 @@ import { authOptions } from "@/lib/auth/authOptions";
 import prisma from "@/lib/db/db";
 import { orderSchema } from "@/lib/validators/orderSchema";
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_PAYMENT_SECRET_KEY as string, {

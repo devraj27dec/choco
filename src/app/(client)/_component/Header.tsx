@@ -4,23 +4,18 @@ import { cn } from "@/lib/utils";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import CartPage from "../cart/page";
-import { ShoppingCartIcon } from "lucide-react";
-import { useCart } from "@/providers/cart-provider";
-
-const navItems = [
-  {label: 'Home' , href: '/'},
-  {label: 'Best Selling' , href: '/best-selling'},
-  {label: 'Offers' , href: '/offers'},
-  {label: 'Orders' , href: '/account/orders'}
-]
 
 const Header = () => {
   
-  const {items} = useCart()
   const pathname = usePathname();
   const sesssion = useSession();
-
+  
+  const navItems = [
+    {label: 'Home' , href: '/'},
+    {label: 'Best Selling' , href: '/best-selling'},
+    {label: 'Offers' , href: '/offers'},
+    {label: 'Orders' , href: '/account/orders'}
+  ]
   return (
     <header>
       <div className=' flex h-10 items-center justify-center text-center bg-brown-900 text-white px-2 md:px-4'>
@@ -37,13 +32,6 @@ const Header = () => {
               <Link href={item.href}>{item.label}</Link>
             </li>
           ))}
-          <li className=" text-brown-300 underline-offset-4 transition-all hover:cursor-pointer hover:text-brown-900 hover:underline "
-          >
-            <Link href={'/cart'} className="flex">
-              <ShoppingCartIcon/>
-              {items ? items.length : 0}
-            </Link>
-          </li>
             {!sesssion.data?.user ? (
               <li className=" text-brown-300 underline-offset-4 transition-all hover:cursor-pointer hover:text-brown-900 hover:underline ">
                 <button onClick={() => signIn()}>
