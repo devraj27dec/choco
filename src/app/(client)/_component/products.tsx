@@ -14,8 +14,7 @@ const Products = () => {
     queryKey: ["products"],
     queryFn: getAllProducts,
   });
-
-
+  
   return (
     <section className=" bg-[#f5f5f5] px-14 md:py-20">
       <div className=" mx-auto max-w-6xl">

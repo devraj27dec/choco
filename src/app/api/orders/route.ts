@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: "usd",
             product_data: { name: foundProduct.name },
-            unit_amount: foundProduct.price * 100, // Stripe expects amounts in cents
+            unit_amount: foundProduct.price * 100,
           },
           quantity: validatedData.qty,
         },

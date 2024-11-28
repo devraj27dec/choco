@@ -20,7 +20,6 @@ const OrderPage = () => {
       </div>
 
       {isError && <span className="text-red-500">Something went wrong.</span>}
-
       {isLoading ? (
           <div className="flex items-center justify-center">
               <Loader2 className="size-10 animate-spin" />

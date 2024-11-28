@@ -75,3 +75,8 @@ export const getMyOrders = async() => {
     const response = await api.get('/orders/history');
     return await response.data;
 }
+
+export const getWarehouseByPostcode = async(postcode:string) => {
+    const response = await api.get(`/warehouses?postcode=${postcode}`);
+    return await response.data; 
+}

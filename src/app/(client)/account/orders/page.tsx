@@ -20,7 +20,7 @@ const MyOrdersPage = () => {
     queryFn: getMyOrders,
   });
 
-  // console.log('My Orders', myOrders);
+  console.log('My Orders', myOrders);
 
   return (
     <div>

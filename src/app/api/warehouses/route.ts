@@ -37,8 +37,30 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+
+
+export async function GET(req: NextRequest) {
+  const {searchParams} = new URL(req.url)
+  const postcode = searchParams.get("postcode")
   try {
+    if(postcode){
+      const warehouseByPostcode = await prisma.warehouse.findMany({
+        orderBy: [
+          {
+            pincode:postcode ? "desc" : undefined
+          },{
+            name:"desc"
+          }
+        ],
+        where: {
+          OR : [
+            {pincode : postcode}
+          ]
+        }
+      })
+      return NextResponse.json(warehouseByPostcode , {status: 200})
+    }
+
     const allWarehouses = await prisma.warehouse.findMany();
     return NextResponse.json(allWarehouses);
   } catch (error) {

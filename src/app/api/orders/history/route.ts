@@ -11,8 +11,6 @@ export async function GET(req: NextRequest) {
     return Response.json({ message: "Not allowed" }, { status: 401 });
   }
 
-  
-
   try {
     const myOrders = await prisma.order.findMany({
       where:{userId: session.user.id},
