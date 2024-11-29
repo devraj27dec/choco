@@ -1,14 +1,14 @@
 "use client";
-import { Product } from "@/types";
+import { Product, RatingData } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { getSingleProduct, placeOrder } from "@/http/api";
+import { getSingleProduct, placeOrder, submitRating } from "@/http/api";
 import { useParams, usePathname } from "next/navigation";
 import Header from "../../_component/Header";
 import { Loader2, Star } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { loadStripe } from "@stripe/stripe-js";
+// import { loadStripe } from "@stripe/stripe-js";
 import { orderSchema } from "@/lib/validators/orderSchema";
 import {
   Form,
@@ -48,7 +48,9 @@ const SingleProduct = () => {
   console.log('session' , session);
 
   // const [clientSecret, setClientSecret] = useState<string | null>(null);
-  
+
+  const [rating , setRating] = useState<number | null>(null)
+  const [hover, setHover] = useState<number | null>(null);
 
   const { data: product, isLoading } = useQuery<Product>({
     queryKey: ["product", id],
@@ -76,7 +78,6 @@ const SingleProduct = () => {
       if(err.response?.data){
         const customErr = err.response.data as CustomError;
         console.error('Error Details', customErr.message)
-        
         toast({
           title: customErr.message,
           color: 'red'
@@ -88,8 +89,33 @@ const SingleProduct = () => {
     }
   });
 
+  
+  const { mutate:submitingMutate} = useMutation({
+    mutationKey: ["submit-rating"],
+    mutationFn: (ratingData: RatingData) => submitRating(ratingData),
+    onSuccess: () => {
+      toast({ title: "Rating submitted successfully!", color: "green" });
+    },
+    onError: (error) => {
+      toast({ title: error.message || "Failed to submit rating", color: "red" });
+    },
+  });
+
+  const handleRating = (value: number) => {
+    setRating(value)
+    const ratingData: RatingData = {
+      productId: Number(id),
+      rating:value,
+    };
+    submitingMutate(ratingData)
+  };
+
+
+
+
   type FormValues = z.infer<typeof orderSchema>;
 
+  
   const handleSubmit = (values: FormValues) => {
     console.log('form Values', values);
     mutate(values);
@@ -103,6 +129,9 @@ const SingleProduct = () => {
     }
     return 0;
   }, [qty, product]);
+
+
+  
 
   return (
     <>
@@ -150,13 +179,22 @@ const SingleProduct = () => {
               </h2>
               <div className="flex items-center gap-x-3">
                 <div className="flex items-center gap-x-0.5">
-                  <Star className="size-4 text-yellow-400" fill="#facc15" />
-                  <Star className="size-4 text-yellow-400" fill="#facc15" />
-                  <Star className="size-4 text-yellow-400" fill="#facc15" />
-                  <Star className="size-4 text-yellow-400" fill="#facc15" />
-                  <Star className="size-4 text-yellow-400" />
+                {[...Array(5)].map((_, index:number) => (
+                    <Star
+                    key={index}
+                    className="size-8 text-yellow-400 cursor-pointer"
+                    fill={
+                      index + 1 <= (hover || rating || product?.rating || 0)
+                        ? "#facc15"
+                        : "#e4e5e9"
+                    }
+                    onMouseEnter={() => setHover(index + 1)}
+                    onMouseLeave={() => setHover(null)}
+                    onClick={() => handleRating(index + 1)}
+                    />
+                  ))}
                 </div>
-                <span className="text-sm">144 Reviews</span>
+                <span className="text-sm">{product?.ratingCount} Reviews</span>
               </div>
 
               <p className=" mt-1">{product?.description}</p>

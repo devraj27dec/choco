@@ -25,6 +25,7 @@ model User {
   updatedAt  DateTime @default(now()) @updatedAt
   createdAt  DateTime @default(now())
   orders     Order[]
+  ratings    Rating[]
 }
 
 model Product {
@@ -38,6 +39,20 @@ model Product {
   createdAt   DateTime    @default(now())
   orders      Order[]
   inventories Inventory[]
+  ratings     Rating[]
+}
+
+model Rating {
+  id          Int       @id @default(autoincrement())
+  productId   Int
+  userId      String
+  rating      Int
+  createdAt   DateTime  @default(now())
+
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
 }
 
 model Warehouse {
@@ -51,18 +66,17 @@ model Warehouse {
   inventories     Inventory[]
   deliveryPersons DeliveryPerson[]
 
-
   @@index([pincode], name: "pincode_index")
 }
 
 model Order {
-  id        String      @id @default(uuid())
+  id        String   @id @default(uuid())
   userId    String
   status    String
   type      String   @default("quick")
   price     Float
   address   String
-  productId Int?
+  productId Int
   qty       Int
   updatedAt DateTime @default(now()) @updatedAt
   createdAt DateTime @default(now())
@@ -75,9 +89,9 @@ model Order {
 }
 
 model DeliveryPerson {
-  id          String @id @default(uuid())
-  name        String @db.VarChar(100)
-  phone       String @db.VarChar(13)
+  id          String  @id @default(uuid())
+  name        String  @db.VarChar(100)
+  phone       String  @db.VarChar(13)
   warehouseId Int?
   orderId     String?
 
@@ -89,15 +103,15 @@ model DeliveryPerson {
 }
 
 model Inventory {
-  id          String    @id @default(uuid())
-  sku         String    @unique @db.VarChar(8)
-  orderId     String?   @unique
+  id          String  @id @default(uuid())
+  sku         String  @unique @db.VarChar(8)
+  orderId     String? @unique
   warehouseId Int
   productId   Int
 
   updatedAt DateTime @default(now()) @updatedAt
   createdAt DateTime @default(now())
-  
+
   order     Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
   warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
   product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)

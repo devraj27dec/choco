@@ -1,15 +1,12 @@
 'use client';
-
 import { cn } from "@/lib/utils";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const Header = () => {
-  
   const pathname = usePathname();
   const sesssion = useSession();
-  
   const navItems = [
     {label: 'Home' , href: '/'},
     {label: 'Offers' , href: '/offers'},

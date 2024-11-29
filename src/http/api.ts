@@ -1,6 +1,7 @@
 
-import { DeliveryPerson, InventoryData, OrderData, Warehouse , OrderStatusData } from "@/types";
+import { DeliveryPerson, InventoryData, OrderData, Warehouse , OrderStatusData, RatingData } from "@/types";
 import { api } from "./client"
+import { randomBytes } from "crypto";
 
 export const getAllProducts = async() => {
     const response = await api.get('/products')
@@ -17,7 +18,7 @@ export const createProduct = async(data: FormData) => {
 }
 
 
-export const getSingleProduct = async (id: string) => {
+export const getSingleProduct = async(id: string) => {
     const response = await api.get(`/products/${id}`)
     return await response.data;
 }
@@ -42,8 +43,6 @@ export const createDeliveryPerson = async (data: DeliveryPerson) => {
     const response = await api.post('delivery-persons' , data)
     return await response.data;
 }
-
-
 
 
 export const createInventory = async(data: InventoryData) => {
@@ -79,4 +78,14 @@ export const getMyOrders = async() => {
 export const getWarehouseByPostcode = async(postcode:string) => {
     const response = await api.get(`/warehouses?postcode=${postcode}`);
     return await response.data; 
+}
+
+export const submitRating = async(data:RatingData) => {
+    try {
+        const response = await api.post(`/products/rating` , data)
+        return await response.data
+    } catch (error) {
+        console.log(error)
+        return error
+    }
 }

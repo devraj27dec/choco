@@ -6,6 +6,8 @@ import prisma from "@/lib/db/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
 
+
+
 export async function POST(request: NextRequest) {
 
   const session = await getServerSession(authOptions)
@@ -14,11 +16,9 @@ export async function POST(request: NextRequest) {
     return Response.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  
   if (session.user?.role !== 'admin') {
     return Response.json({ message: 'Not allowed' }, { status: 403 });
   }
-  
 
   const data = await request.formData();
 
@@ -78,6 +78,12 @@ export async function GET() {
     const allProducts = await prisma.product.findMany({
       orderBy: {
         id: "desc"
+      },include: {
+        _count: {
+          select:{
+            ratings:true
+          }
+        }
       }
     })
     return Response.json(allProducts);

@@ -1,3 +1,5 @@
+
+
 export interface Product {
     id: number;
     qty:number;
@@ -5,6 +7,12 @@ export interface Product {
     description: string;
     image: string;
     price: number;
+    rating:number;
+    ratingCount:number;
+}
+export interface RatingData {
+    productId: number,
+    rating:number
 }
 
 export interface Warehouse {
@@ -67,3 +75,4 @@ export interface MyOrder {
     type: string;
     createdAt: string;
 }
+
