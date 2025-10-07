@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import prisma from "@/lib/db/db";
+export const runtime = "nodejs"; 
+export const dynamic = "force-dynamic"; 
+
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2024-06-20",
 });
 
-export const runtime = "nodejs"; 
-export const dynamic = "force-dynamic"; 
 
 export async function POST(request: Request) {
   const sig = request.headers.get("stripe-signature") || "";
