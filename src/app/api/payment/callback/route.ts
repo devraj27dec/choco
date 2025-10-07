@@ -1,22 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { buffer } from "micro";
 import prisma from "@/lib/db/db";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2024-06-20",
 });
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+export const runtime = "nodejs"; 
+export const dynamic = "force-dynamic"; 
 
 export async function POST(request: Request) {
   const sig = request.headers.get("stripe-signature") || "";
 
-  // Convert ReadableStream to Buffer
   const buffer = await request.arrayBuffer();
   const body = Buffer.from(buffer);
 
@@ -36,12 +31,10 @@ export async function POST(request: Request) {
 
   if (event.type === "payment_intent.succeeded") {
     try {
-      // Update order status to 'paid'
       await prisma.order.update({
         where: { id: data.metadata.order_id },
         data: { status: "paid" },
       });
-
       return new Response(JSON.stringify({ message: "OK" }), { status: 200 });
     } catch (err) {
       console.error("Failed to update the order:", err);

@@ -6,8 +6,6 @@ import prisma from "@/lib/db/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
 
-
-
 export async function POST(request: NextRequest) {
 
   const session = await getServerSession(authOptions)

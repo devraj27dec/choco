@@ -5,7 +5,6 @@ import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-
   const session = await getServerSession(authOptions);
 
   if(!session) {
@@ -15,6 +14,7 @@ export async function POST(request: NextRequest) {
   if(session?.user.role !== "admin") {
     return NextResponse.json({message:"Unautorized"} , {status: 403})
   }
+
   const reqData = await request.json();
 
   let validatedData;

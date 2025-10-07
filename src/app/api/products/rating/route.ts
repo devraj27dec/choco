@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
   if (session?.user?.role !== "customer") {
     return NextResponse.json({ message: "User Not Found " }, { status: 403 });
   }
+
   try {
     const body = await request.json();
     const validateData = ratingSchema.parse(body);
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
-
+    
     const updateProduct = await prisma.rating.create({
       data: {
         productId: validateData.productId,

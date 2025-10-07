@@ -7,7 +7,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     try {
     const product = await prisma.product.findFirst({
         where: {
-        id: Number(id)
+            id: Number(id)
         },
     });
 
@@ -16,6 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     return NextResponse.json(product);
+    
     } catch (error) {
     return NextResponse.json({ message: "Failed to fetch the product" }, { status: 500 });
     }

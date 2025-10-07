@@ -13,6 +13,7 @@ const Header = () => {
     {label: 'Orders' , href: '/account/orders'},
     {label: "Store Locator" , href:"/store-locator"}
   ]
+
   return (
     <header>
       <div className=' flex h-10 items-center justify-center text-center bg-brown-900 text-white px-2 md:px-4'>
@@ -38,7 +39,7 @@ const Header = () => {
             ) : (
               <li className=" text-brown-300 underline-offset-4 transition-all hover:cursor-pointer hover:text-brown-900 hover:underline " onClick={() => signOut()}>
                 <button>
-                  SignUp
+                  Sign out
                 </button>
               </li>
             )}
