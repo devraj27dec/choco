@@ -9,7 +9,7 @@ const Header = () => {
   const sesssion = useSession();
   const navItems = [
     {label: 'Home' , href: '/'},
-    {label: 'Offers' , href: '/offers'},
+    // {label: 'Offers' , href: '/offers'},
     {label: 'Orders' , href: '/account/orders'},
     {label: "Store Locator" , href:"/store-locator"}
   ]

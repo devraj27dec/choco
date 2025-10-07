@@ -35,7 +35,7 @@ const CreateWarehousesForm = ({
   const handleSubmit = (values: FormValues) => {
     onSubmit(values)
   }
-    
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
