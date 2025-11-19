@@ -9,6 +9,7 @@ export interface Product {
     price: number;
     rating:number;
     ratingCount:number;
+    availableInventory?:AvailableInventoryData[]
 }
 export interface RatingData {
     productId: number,
@@ -76,3 +77,10 @@ export interface MyOrder {
     createdAt: string;
 }
 
+
+
+interface AvailableInventoryData {
+    warehouseName:string;
+    pincode:string;
+    deliveryPersonCount:number
+}

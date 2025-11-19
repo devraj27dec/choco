@@ -1,5 +1,5 @@
 "use client";
-import { Product, RatingData } from "@/types";
+import { Product} from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import { getSingleProduct, placeOrder, submitRating } from "@/http/api";
@@ -29,6 +29,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { AxiosError } from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import InventorySidebar, {} from '@/app/(client)/_component/InventorySidebar'
 
 type CustomError =  {
   message: string;
@@ -42,20 +43,24 @@ const SingleProduct = () => {
   const id = params.id;
   const pathname = usePathname();
   // console.log('pathname' , pathname);
+
+  const [open , setOpen] = useState(false)
   
 
   const {data:session} = useSession();
-  console.log('session' , session);
+  // console.log('session' , session);
 
   // const [clientSecret, setClientSecret] = useState<string | null>(null);
 
-  const [rating , setRating] = useState<number | null>(null)
-  const [hover, setHover] = useState<number | null>(null);
+  // const [rating , setRating] = useState<number | null>(null)
+  // const [hover, setHover] = useState<number | null>(null);
 
   const { data: product, isLoading } = useQuery<Product>({
     queryKey: ["product", id],
     queryFn: () => getSingleProduct(id as string),
   }); 
+
+  // console.log(typeof(product))
 
   const form = useForm<z.infer<typeof orderSchema>>({
     resolver: zodResolver(orderSchema),
@@ -90,25 +95,25 @@ const SingleProduct = () => {
   });
 
   
-  const { mutate:submitingMutate} = useMutation({
-    mutationKey: ["submit-rating"],
-    mutationFn: (ratingData: RatingData) => submitRating(ratingData),
-    onSuccess: () => {
-      toast({ title: "Rating submitted successfully!", color: "green" });
-    },
-    onError: (error) => {
-      toast({ title: error.message || "Failed to submit rating", color: "red" });
-    },
-  });
+  // const { mutate:submitingMutate} = useMutation({
+  //   mutationKey: ["submit-rating"],
+  //   mutationFn: (ratingData: RatingData) => submitRating(ratingData),
+  //   onSuccess: () => {
+  //     toast({ title: "Rating submitted successfully!", color: "green" });
+  //   },
+  //   onError: (error) => {
+  //     toast({ title: error.message || "Failed to submit rating", color: "red" });
+  //   },
+  // });
 
-  const handleRating = (value: number) => {
-    setRating(value)
-    const ratingData: RatingData = {
-      productId: Number(id),
-      rating:value,
-    };
-    submitingMutate(ratingData)
-  };
+  // const handleRating = (value: number) => {
+  //   setRating(value)
+  //   const ratingData: RatingData = {
+  //     productId: Number(id),
+  //     rating:value,
+  //   };
+  //   submitingMutate(ratingData)
+  // };
 
 
 
@@ -124,7 +129,8 @@ const SingleProduct = () => {
   const qty = form.watch('qty')
 
   const price = useMemo(() => {
-    if (product?.price) {
+
+    if (product?.price && qty > 0) {
       return product.price * qty;
     }
     return 0;
@@ -184,13 +190,13 @@ const SingleProduct = () => {
                     key={index}
                     className="size-8 text-yellow-400 cursor-pointer"
                     fill={
-                      index + 1 <= (hover || rating || product?.rating || 0)
+                      index + 1 <= (product?.rating || 2)
                         ? "#facc15"
                         : "#e4e5e9"
                     }
-                    onMouseEnter={() => setHover(index + 1)}
-                    onMouseLeave={() => setHover(null)}
-                    onClick={() => handleRating(index + 1)}
+                    // onMouseEnter={() => setHover(index + 1)}
+                    // onMouseLeave={() => setHover(null)}
+                    // onClick={() => handleRating(index + 1)}
                     />
                   ))}
                 </div>
@@ -255,6 +261,7 @@ const SingleProduct = () => {
                                 className="h-9 border-brown-200 bg-white placeholder:text-gray-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brown-400 focus-visible:ring-offset-0"
                                 placeholder="e.g. 1"
                                 {...field}
+                                min={1}
                                 onChange={(e) => {
                                   const value = parseFloat(e.target.value);
                                   field.onChange(value);
@@ -280,6 +287,23 @@ const SingleProduct = () => {
                       </Link>
                     )}
                   </div>
+
+                  <div className="text-sm text-gray-800">
+                    To see which delivery persons and warehouses are available for this product,{" "}
+                    <a
+                      className="text-primary text-lg font-bold underline cursor-pointer"
+                      onClick={() => setOpen(true)}
+                    >
+                      view
+                    </a>
+                    .
+                  </div>
+
+
+                  <InventorySidebar 
+                    open={open} setOpen={setOpen}
+                    product={product || undefined}
+                  />
                 </form>
               </Form>
             </div>

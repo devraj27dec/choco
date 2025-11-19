@@ -59,7 +59,7 @@ export async function GET() {
         sku: true,
         warehouse: {
           select: {
-            name: true, // Fetch warehouse name
+            name: true,
           },
         },
         product: {

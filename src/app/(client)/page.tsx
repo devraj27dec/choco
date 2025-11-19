@@ -10,10 +10,12 @@ import { useSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
 
 const HomePage = () => {
+
   const { data: session} = useSession();
+  // console.log(`your are ${session?.user.role}`)
   if(session?.user.role === 'admin'){
-    redirect('/admin')
-  }  
+    redirect('/admin' )
+  }
 
   return (
     <>

@@ -4,16 +4,26 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getAllProducts } from "@/http/api";
 import { Product } from "@/types";
 import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
-import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 const Products = () => {
+  const { toast } = useToast();
+  const router = useRouter()
+  const {data: session} = useSession()
+
+
   const skeltons = Array.from({ length: 4 });
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: getAllProducts,
+    staleTime: 1000 * 60,
   });
+
+
   
   return (
     <section id="product" className=" bg-[#f5f5f5] px-14 md:py-20">
@@ -59,14 +69,24 @@ const Products = () => {
                         <span className="font-bold">{product.price}</span>
                       </div>
 
-                      <Link href={`/product/${product.id}`}>
+                      {/* <Link href={}> */}
                         <Button
+                          onClick={() => {
+                            if(!session){
+                              toast({
+                                title: "Please Sign in to continue.",
+                                variant:"destructive"
+                              });
+                            }else{
+                              router.push(`/product/${product.id}`)
+                            }
+                          }}
                           size="sm"
                           className="mt-5 w-full bg-brown-900 hover:bg-brown-800 active:bg-brown-700"
                         >
                           Buy Now
                         </Button>
-                      </Link>
+                      {/* </Link> */}
                     </div>
                   </div>
                 ))}
