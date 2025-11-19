@@ -31,7 +31,7 @@ export default async function RootLayout({
           "min-h-screen bg-background font-sans antialiased",
           inter.variable)}>
             <QueryProvider>
-                <AuthProvider session={session}>{children}</AuthProvider>
+              <AuthProvider session={session}>{children}</AuthProvider>
             </QueryProvider>
         <Toaster />
       </body>

@@ -1,7 +1,7 @@
-"use client"
-import { Button } from '@/components/ui/button'
+
+// import { Button } from '@/components/ui/button'
 import Image from 'next/image'
-import React, { useEffect } from 'react'
+import React from 'react'
 import bgImage from '../../../../public/hero_choco.jpg'
 
 
@@ -15,9 +15,9 @@ const Hero = () => {
           to your door, swiftly and reliably. Convenience and indulgence, all in one
           package.
           </p>
-          <Button variant="secondary" className=' mt-6 lg:mt-8 w-fit md:px-8 px-6'>
-              Shop now
-          </Button>
+          <a href='#product' className=' mt-6 lg:mt-8 w-fit md:px-8 px-6 bg-secondary p-2 text-black rounded-md'>
+            Shop now
+          </a>
         </div>
         <Image
          src={bgImage}

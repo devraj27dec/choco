@@ -35,8 +35,7 @@ export async function POST(request: NextRequest) {
   const inputImage = isServer
     ? (validatedData.image as File)
     : (validatedData.image as FileList)[0];
-  const filename = `${Date.now()}.${inputImage.name.split(".").slice(-1)}`; // choco.png 213123123123.png
-
+  const filename = `${Date.now()}.${inputImage.name.split(".").slice(-1)}`;
 
   try {
     const buffer = Buffer.from(await inputImage.arrayBuffer());
